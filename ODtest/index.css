@@ -1,0 +1,59 @@
+.uploadBox {
+    width: 80%;
+    height: 2em;
+    position: relative;
+    background-color:rgba(0, 0, 0, 0);
+    border: 0px;
+}
+
+.newDirBox {
+  width: 80%;
+  position: relative;
+  float: left;
+}
+
+.createDirBox {
+    width: 80%;
+    height: 2em;
+    position: relative;
+    background-color:rgba(0, 0, 0, 0);
+    border: 0px;
+}
+
+.personalBox {
+    width: 90%;
+    height: 5em;
+    position: relative;
+    left: 2%;
+    background-color: #F0FFFF;
+    padding: 5px;
+    border-radius: 5%;
+}
+
+.uploadBtn {
+    padding: 5px;
+    font-size: 15px;
+    color: white;
+    background: #5F9EA0;
+    border: none;
+    border-radius: 5px;
+}
+
+.leftBox {
+  width:25%;
+  height: 90%;
+  float:left;
+  font-size:15px;
+  font-weight:bold;
+  background-color:#cecece;
+  padding: 1em;
+}
+
+.rightBox {
+  width:60%;
+  height: 90%;
+  float:left;
+  font-size:15px;
+  font-weight:bold;
+  background: color #fffaf3;
+}
