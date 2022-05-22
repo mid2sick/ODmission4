@@ -4,21 +4,16 @@
 ## 目前 Database 的 table
 1. login: 紀錄使用者資訊
 
-![Screenshot from 2022-05-14 21-21-28](https://user-images.githubusercontent.com/34702573/168427711-51f48786-4093-4a0a-9f93-85a65e4d3259.png)
+![Screenshot from 2022-05-22 21-24-54](https://user-images.githubusercontent.com/34702573/169697477-1d67047d-e71e-4701-b2bf-70425dd52e0a.png)
 
-2. directory: 紀錄每個資料夾內 metadata 的 id（id 最終該怎麼存還待任務一確定）  
-附註：下圖的 documentID 是手動加上去的，目前程式還無法編輯此部份
+2. directory: 紀錄每個資料夾的資訊，其中 metadata 欄位為此資料夾所有的 metadata 的 json 檔
+附註：下圖的 metadata 是手動加上去的，目前程式還無法編輯此部份
 
-![Screenshot from 2022-05-14 21-23-51](https://user-images.githubusercontent.com/34702573/168427714-38f8249f-4155-4235-9d30-b0c370597f79.png)
-
-3. serverVar: 紀錄 server 自己的變數，目前只紀錄了所有資料夾的數量，作為下個新資料夾的編號  
-附註：亦即儲存 directoryID 的最大值 + 1
-
-![Screenshot from 2022-05-14 21-24-03](https://user-images.githubusercontent.com/34702573/168427716-75cae918-c932-4b48-9f88-3fd6221d347b.png)
+![Screenshot from 2022-05-22 21-26-33](https://user-images.githubusercontent.com/34702573/169697478-a259cd85-f83d-450d-a1db-5f85e1045b6b.png)
 
 ## 登入機制
 - 跟登入有關的檔案都在 registration/ 裡面（除了 index.php 是在外面）
-- 登入流程：
+- 登入流程（尚未更新成和任務三合併的部份）：
 
 ![login](https://user-images.githubusercontent.com/34702573/168427490-101a314c-4a0e-4230-a60e-4f5108f04543.png)
 
