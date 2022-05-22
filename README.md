@@ -6,21 +6,26 @@
 1. 註冊使用者資料
 2. 登入登出
 3. 使用者可以開新資料夾
-4. 可以從 DB 抓使用者開的資料夾
-5. 可以上傳 csv 到指定資料夾
+4. 可以從 DB 抓使用者開的資料夾資料
+5. 可以上傳 csv 到本機指定資料夾
+6. 可以瀏覽每個資料夾內 metadata
 
 ### 待完成
 1. 刪除資料夾功能
-2. 接 mission2 的 parse ID、丟給 search engine 查詢、分配 thread 回傳要爬的 id 給 mission2
-3. 編輯 table `directory` 內 的 documentIDs
-4. 可以瀏覽每個資料夾內 metadata 的功能
+2. 接 mission2 的 parse ID、丟給 search engine 查詢、分配 thread 回傳要爬的 id 給 mission2  
+![圖片](https://user-images.githubusercontent.com/34702573/169698811-a21e3a8d-8549-4de2-a211-69290ad55f55.png)  
+3. 根據 mission2 的 parse ID 將 OD sky（DB 內所有 metadata 的那份 table）內相應的 metadata 複製到 `directory` table（個人資料夾）的 metadata 欄位
+4. 刪除 `directory` table 內 的 metadata
 5. metadata 的後分類查詢、關鍵字查詢
+6. 跟 mission 3 的修改合併
+7. 跟 mission 5 合併
+8. 套上 vue3
 
 ## 後台已有的 API
-1. createDir.php:   
+### 1. createDir.php:   
 client 端 submit name='createDir' 的 input 時此 API 會被呼叫。  
 此 API 的輸入為 username 與 newDir（欲創建資料夾的名字），在 `directory` table 建立一個 row，其中 dirName = newDir, username = username    
-2. getDirList.php:  
+### 2. getDirList.php:  
 此 API 的輸入為 username，輸出為一個 DIR object，DIR 的結構如下：  
 ```php
 class DIR {
@@ -30,10 +35,10 @@ class DIR {
 ```
 其中的 IDs 和 names 皆為 json 型態，是此 username 擁有的所有 directory 的 id 與 name。  
 詳細處理方法可參考呼叫此 API 的 updateDirList.js  
-3. seeMetadata.php:  
+### 3. seeMetadata.php:  
 此 API 的輸入為 username 與 id（directory 的 id），輸出為此 directory 內所有 metadata 的 json 檔。
 詳細處理方法可參考呼叫此 API 的 openDir.js  
-4. upload.php:  
+### 4. upload.php:  
 client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。  
 此 API 的輸入為檔案的名字，會將此檔案儲存在本機的 $targetDir 處，請記得在不同主機上時更新此變數。  
 
