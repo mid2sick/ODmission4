@@ -11,6 +11,7 @@
 		unset($_SESSION['username']);
 		header("location: registration/login.php");
 	}
+	$username= $_SESSION['username'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -20,6 +21,8 @@
 		<link rel="stylesheet" type="text/css" href="index.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script type="text/javascript" src="updateDirList.js"></script>
+		<script type="text/javascript" src="openDir.js"></script>
+
 	</head>
 	<body>
 
@@ -74,7 +77,7 @@
 						
 					</div>
 					<div id="dirList">
-						
+						<!-- where the directory list will show up at -->
 					</div>
 				</div>
 				
@@ -90,10 +93,15 @@
 						<input type="submit" class="uploadBtn" value="Upload File" name="submitCSV">
 					</div>
 				</form>
+				<!-- show the metadata -->
+				<div id="metaList">
+					<!-- where the metadata wiil be put at -->
+				</div>
 			</div>
 		</div>
 		<script>
-			updateDirList('<?php echo $_SESSION['username']?>');
+			var usr = '<?php echo $username; ?>';
+			updateDirList(usr);
 		</script>
 	</body>
 </html>

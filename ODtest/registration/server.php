@@ -42,7 +42,7 @@ if (isset($_POST['reg_user'])) {
     }
   }
     /*echo '<script type="text/javascript">',
-    'console.log("in server, count errors:"'.count($errors).')',
+    'console.log("in server, count errors:'.count($errors).'")',
     '</script>'
     ;
     */
@@ -50,7 +50,7 @@ if (isset($_POST['reg_user'])) {
   // Finally, register user if there are no errors in the form
   if (count($errors) == 0) {
   	$password = md5($password_1);//encrypt the password before saving in the database
-  	$query = "INSERT INTO `login`(`username`, `email`, `password`, `directoryIDs`, `directoryNames`) VALUES('$username', '$email', '$password', '[]', '[]')";
+  	$query = "INSERT INTO `login`(`username`, `email`, `password`) VALUES('$username', '$email', '$password')";
   	mysqli_query($db, $query);
   	$_SESSION['username'] = $username;
   	$_SESSION['success'] = "You are now logged in";

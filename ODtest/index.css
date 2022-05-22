@@ -39,9 +39,12 @@
     border-radius: 5px;
 }
 
+.content {
+  overflow: auto;
+}
+
 .leftBox {
   width:25%;
-  height: 90%;
   float:left;
   font-size:15px;
   font-weight:bold;
@@ -51,9 +54,57 @@
 
 .rightBox {
   width:60%;
-  height: 90%;
   float:left;
   font-size:15px;
   font-weight:bold;
   background: color #fffaf3;
 }
+
+#metaList {
+  position: relative;
+  left: 60px;
+}
+
+.metaStack {
+  position: relative;
+  top: 20px;
+  font-size: 16px;
+  font-weight:bold;
+  border: 3px solid #7dcea0 ;
+  display: block;
+  margin:20px 0px 5px 0px;
+
+}
+
+.metaRow {
+  position: relative;
+  border-top: 1px solid #7dcea0;
+}
+
+.metaBlock {
+  height: 100%;
+  display: table-cell;
+  padding: 8px 8px 8px 8px;
+}
+
+.defineBlock {
+  background-color: #5F9EA0;
+}
+
+.followDefine {
+  border-left: 1px solid #7dcea0 ;
+  position: relative;
+  left: 20px;
+}
+
+.titleBlock {
+  border-left: 1px solid #7dcea0 ;
+  position: relative;
+}
+
+.followMeta {
+  border-left: 1px solid #7dcea0 ;
+  position: relative;
+  left: 20px;
+}
+
