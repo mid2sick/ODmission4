@@ -1,13 +1,22 @@
 <?php
 function getConnection()
 {
-	$dbms = 'mysql';
+	/* Revise below to meet your actual need. */
 	$host = 'localhost';
-	$dbname = 'test'; // TODO need to revise
-	$dsn = "$dbms:host=$host;dbname=$dbname;charset=utf8mb4"; // To support Chinese
-	$username = 'root';  // TODO need to revise
-	$password = null; // TODO need to revise
-	$option = null;
+	$dbname = 'test';
+	$username = 'root';
+	$password = null;
 
-	return new PDO($dsn, $username, $password, $option);
+	/* Unless necessary, do not revise below. */
+	$dbms = 'mysql';
+	$charset = 'utf8mb4'; // To support Chinese
+
+	/* Never revise below. */
+	$dsn = "$dbms:host=$host;dbname=$dbname;charset=$charset";
+	$options = [
+		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+	];
+
+	return new PDO($dsn, $username, $password, $options);
 }

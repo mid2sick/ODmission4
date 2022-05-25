@@ -5,6 +5,8 @@
 class User
 {
 	private $id;
+	private $last_err;
+	private $production_mode; // TODO this should be in config file
 	//private $session_id; future work
 
 	function __construct($user_id)
@@ -20,18 +22,24 @@ class User
 	 */
 	function addDir($dir_name)
 	{
-		$conn = getConnection();
+		$result = false;
 
-		$stmt = $conn->prepare('
-				INSERT INTO User_Dir (Owner_ID, Name)
-				VALUES (:Owner_ID, :Dir_Name)
-			');
-		$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
-		$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-		$result = $stmt->execute();
+		try {
+			$conn = getConnection();
 
-		$stmt = null;
-		$conn = null;
+			$stmt = $conn->prepare('
+					INSERT INTO User_Dir (Owner_ID, Name)
+					VALUES (:Owner_ID, :Dir_Name)
+				');
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
+			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
+			$result = $stmt->execute();
+
+			$stmt = null;
+			$conn = null;
+		} catch (PDOException $e) {
+			$this->setError('addDir', $e);
+		}
 
 		return $result;
 	}
@@ -43,23 +51,29 @@ class User
 	 */
 	function listDirs()
 	{
-		$conn = getConnection();
+		$user_dirs = null;
 
-		$stmt = $conn->prepare('
-				SELECT Name
-				FROM User_Dir
-				WEHRE Owner_ID = :Owner_ID
-			');
-		$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
-		$stmt->execute();
-		$result = $stmt->fetchAll();
+		try {
+			$conn = getConnection();
 
-		$stmt = null;
-		$conn = null;
+			$stmt = $conn->prepare('
+					SELECT Name
+					FROM User_Dir
+					WEHRE Owner_ID = :Owner_ID
+				');
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetchAll();
 
-		$user_dirs = array();
-		foreach ($result as $row) {
-			$user_dirs[] = $row['Name'];
+			$stmt = null;
+			$conn = null;
+
+			$user_dirs = array();
+			foreach ($result as $row) {
+				$user_dirs[] = $row['Name'];
+			}
+		} catch (PDOException $e) {
+			$this->setError('listDirs', $e);
 		}
 
 		return $user_dirs;
@@ -73,71 +87,85 @@ class User
 	 */
 	function removeDir($dir_name)
 	{
-		$conn = getConnection();
+		$result = false;
 
-		$stmt = $conn->prepare('
-				DELETE FROM User_Dir
-				WHERE Owner_ID = :Owner_ID
-					AND Name = :Dir_Name
-			');
-		$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
-		$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-		$result = $stmt->execute();
+		try {
+			$conn = getConnection();
 
-		$stmt = null;
-		$conn = null;
+			$stmt = $conn->prepare('
+					DELETE FROM User_Dir
+					WHERE Owner_ID = :Owner_ID
+						AND Name = :Dir_Name
+				');
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
+			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
+			$result = $stmt->execute();
+
+			$stmt = null;
+			$conn = null;
+		} catch (PDOException $e) {
+			$this->setError('removeDir', $e);
+		}
 
 		return $result;
 	}
 
 	/**
-	 * Add multiple docs to a dir.
+	 * Add multiple docs to a dir. If a doc found existing, its addition
+	 * will be discarded. 
 	 *
 	 * @param   string  $dir_name
 	 * @param   int[]   $doc_ids
 	 * @return  bool    $success_or_not
 	 */
-	function addDoc($dir_name, $doc_ids)
+	function addDocs($dir_name, $doc_ids)
 	{
-		$conn = getConnection();
+		$result = false;
 
-		$stmt = $conn->prepare('
-				SELECT ID
-				FROM User_Dir
-				WHERE Owner_ID = :Owner_ID
-					AND Name = :Dir_Name
-			');
-		$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
-		$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-		$stmt->execute();
-		$dir_id = $stmt->fetch();
+		try {
+			$conn = getConnection();
 
-		$stmt = null;
+			$stmt = $conn->prepare('
+					SELECT ID
+					FROM User_Dir
+					WHERE Owner_ID = :Owner_ID
+						AND Name = :Dir_Name
+				');
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
+			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
+			$stmt->execute();
+			$dir_id = $stmt->fetch();
 
-		$placeholders = function ($text, $count = 0, $separator = ',') {
-			$result = array();
+			$stmt = null;
 
-			for ($i = 0; $i < $count; $i++)
-				$result[] = $text;
+			$placeholders = function ($text, $count = 0, $separator = ',') {
+				$result = array();
 
-			return implode($separator, $result);
-		};
+				for ($i = 0; $i < $count; $i++)
+					$result[] = $text;
 
-		$insert_values = array();
-		foreach ($doc_ids as $doc_id) {
-			$record = array($dir_id, $doc_id);
-			$question_marks[] = '(' . $placeholders('?', sizeof($record)) . ')';
-			$insert_values = array_merge($insert_values, array_values($record));
+				return implode($separator, $result);
+			};
+
+			$insert_values = array();
+			foreach ($doc_ids as $doc_id) {
+				$record = array($dir_id, $doc_id);
+				$question_marks[] = '(' . $placeholders('?', sizeof($record)) . ')';
+				$insert_values = array_merge($insert_values, array_values($record));
+			}
+
+			$stmt = $conn->prepare(
+				'
+				INSERT IGNORE INTO Dir_Doc (Dir_ID, Doc_ID)
+				VALUES ' . implode(',', $question_marks)
+			);
+			$result = $stmt->execute($insert_values);
+
+			$stmt = null;
+			$conn = null;
+		} catch (PDOException $e) {
+			$this->setError('addDoc', $e);
 		}
-
-		$stmt = $conn->prepare('
-			INSERT IGNORE INTO Dir_Doc (Dir_ID, Doc_ID)
-			VALUES ' . implode(',', $question_marks)
-		);
-		$result = $stmt->execute($insert_values);
-
-		$stmt = null;
-		$conn = null;
 
 		return $result;
 	}
@@ -150,26 +178,32 @@ class User
 	 */
 	function listDocs($dir_name)
 	{
-		$conn = getConnection();
+		$docs = null;
 
-		$stmt = $conn->prepare('
-				SELECT Dir_Doc.Doc_ID AS Doc_ID
-				FROM User_Dir, Dir_Doc
-				WHERE User_Dir.Owner_ID = :Owner_ID
-					AND User_Dir.Name = :Dir_Name
-					AND Dir_Doc.Dir_ID = User_Dir.ID
-			');
-		$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
-		$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-		$stmt->execute();
-		$result = $stmt->fetchAll();
+		try {
+			$conn = getConnection();
 
-		$stmt = null;
-		$conn = null;
+			$stmt = $conn->prepare('
+					SELECT Dir_Doc.Doc_ID AS Doc_ID
+					FROM User_Dir, Dir_Doc
+					WHERE User_Dir.Owner_ID = :Owner_ID
+						AND User_Dir.Name = :Dir_Name
+						AND Dir_Doc.Dir_ID = User_Dir.ID
+				');
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
+			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetchAll();
 
-		$docs = array();
-		foreach ($result as $row) {
-			$docs[] = $row['Doc_ID'];
+			$stmt = null;
+			$conn = null;
+
+			$docs = array();
+			foreach ($result as $row) {
+				$docs[] = $row['Doc_ID'];
+			}
+		} catch (PDOException $e) {
+			$this->setError('listDocs', $e);
 		}
 
 		return $docs;
@@ -184,33 +218,57 @@ class User
 	 */
 	function removeDoc($dir_name, $doc_id)
 	{
-		$conn = getConnection();
+		$result = false;
 
-		$stmt = $conn->prepare('
-				SELECT ID
-				FROM User_Dir
-				WHERE Owner_ID = :Owner_ID
-					AND Name = :Dir_Name
-			');
-		$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
-		$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-		$stmt->execute();
-		$dir_id = $stmt->fetch();
+		try {
+			$conn = getConnection();
 
-		$stmt = null;
+			$stmt = $conn->prepare('
+					SELECT ID
+					FROM User_Dir
+					WHERE Owner_ID = :Owner_ID
+						AND Name = :Dir_Name
+				');
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
+			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
+			$stmt->execute();
+			$dir_id = $stmt->fetch();
 
-		$stmt = $conn->prepare('
-				DELETE FROM Dir_Doc
-				WHERE Dir_ID = :Dir_ID
-					AND Doc_ID = :Doc_ID
-			');
-		$stmt->bindParam(':Dir_ID', $dir_id, PDO::PARAM_INT);
-		$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_INT);
-		$result = $stmt->execute();
+			$stmt = null;
 
-		$stmt = null;
-		$conn = null;
+			$stmt = $conn->prepare('
+					DELETE FROM Dir_Doc
+					WHERE Dir_ID = :Dir_ID
+						AND Doc_ID = :Doc_ID
+				');
+			$stmt->bindParam(':Dir_ID', $dir_id, PDO::PARAM_INT);
+			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_INT);
+			$result = $stmt->execute();
+
+			$stmt = null;
+			$conn = null;
+		} catch (PDOException $e) {
+			$this->setError('removeDoc', $e);
+		}
 
 		return $result;
+	}
+
+	private function setError($location, $exception)
+	{
+		/*
+		 * For debugging only, when a method might fail for various reasons,
+		 * the script is supposed to proceed based on error code.
+		 */
+		if (!$this->production_mode) {
+			echo "[User::$location] Error " . $exception->getCode()
+				. ": " . $exception->getMessage();
+		}
+		$this->last_err = $exception->getCode();
+	}
+
+	function getError()
+	{
+		return $this->last_err;
 	}
 }
