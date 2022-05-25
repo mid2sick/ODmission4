@@ -58,5 +58,34 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
 
 ![login](https://user-images.githubusercontent.com/34702573/168427490-101a314c-4a0e-4230-a60e-4f5108f04543.png)
 
+## Schema
+
+1. 使用者所擁有的資料夾
+
+    ```sql
+    CREATE TABLE User_Dir {
+        ID INTEGER AUTO_INCREMENT UNSIGNED,
+        Owner_ID VARCHAR(32) NOT NULL,
+        Name VARCHAR(32) NOT NULL,
+        PRIMARY KEY (ID),
+        UNIQUE KEY Alias_ID (Owner_ID, Name),
+        FOREIGN KEY (Owner_ID) REFERENCES Docusky_User(ID) ON DELETE CASCADE
+    }
+    ```
+    
+    > **TODO**: What is the schema of the table which stores user information?
+
+2. 資料夾底下的 metadata
+
+    ```sql
+    CREATE TABLE Dir_Doc {
+        Dir_ID INTEGER NOT NULL,
+        Doc_ID INTEGER NOT NULL,
+        PRIMARY KEY (Dir_ID, DOC_ID),
+        FOREIGN KEY (Dir_ID) REFERENCES User_Dir(ID) ON DELETE CASCADE,
+        FOREIGN KEY (Doc_ID) REFERENCES Metadata(ID)
+    }
+    ```
+
 ## 其他
 1. 若下載下來測試，必須更改 upload.php 內的 $target_dir 到想要上傳 csv 的資料夾
