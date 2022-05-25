@@ -63,15 +63,10 @@ class User
 				');
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
 			$stmt->execute();
-			$result = $stmt->fetchAll();
+			$user_dirs = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 			$stmt = null;
 			$conn = null;
-
-			$user_dirs = array();
-			foreach ($result as $row) {
-				$user_dirs[] = $row['Name'];
-			}
 		} catch (PDOException $e) {
 			$this->setError('listDirs', $e);
 		}
@@ -193,15 +188,10 @@ class User
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
 			$stmt->execute();
-			$result = $stmt->fetchAll();
+			$docs = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 			$stmt = null;
 			$conn = null;
-
-			$docs = array();
-			foreach ($result as $row) {
-				$docs[] = $row['Doc_ID'];
-			}
 		} catch (PDOException $e) {
 			$this->setError('listDocs', $e);
 		}
@@ -264,7 +254,7 @@ class User
 			echo "[User::$location] Error " . $exception->getCode()
 				. ": " . $exception->getMessage();
 		}
-		$this->last_err = $exception->getCode();
+		$this->last_err = (int) $exception->getCode();
 	}
 
 	function getError()
