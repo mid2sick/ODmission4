@@ -63,14 +63,20 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
 1. 使用者所擁有的資料夾
 
     ```sql
-    CREATE TABLE User_Dir {
-        ID INTEGER AUTO_INCREMENT UNSIGNED,
-        Owner_ID VARCHAR(32) NOT NULL,
-        Name VARCHAR(32) NOT NULL,
-        PRIMARY KEY (ID),
-        UNIQUE KEY Alias_ID (Owner_ID, Name),
-        FOREIGN KEY (Owner_ID) REFERENCES Docusky_User(ID) ON DELETE CASCADE
-    }
+    /*
+	把大括號改成小括號
+	`login` 是紀錄 user data 的 table
+	還要檢查 Owner_ID 跟 login 裡 ID 的編碼是否一樣（目前是 utf8mb4_general_ci）
+	*/
+
+	CREATE TABLE User_Dir(
+	    ID INT(32) UNSIGNED AUTO_INCREMENT,
+	    Owner_ID VARCHAR(32) NOT NULL,
+	    Name VARCHAR(32) NOT NULL,
+	    PRIMARY KEY (ID),
+	    UNIQUE KEY Alias_ID (Owner_ID, Name),
+	    FOREIGN KEY (Owner_ID) REFERENCES login(ID) ON DELETE CASCADE
+	)
     ```
     
     > **TODO**: What is the schema of the table which stores user information?
