@@ -11,7 +11,7 @@
     $username = $_POST['username'];
 
     
-    $db = mysqli_connect('localhost', 'root', '', 'loginPage') or die("Connect failed: %s\n". $db -> error);
+    $db = mysqli_connect('localhost', 'root', '', 'test') or die("Connect failed: %s\n". $db -> error);
     $query = "SELECT `dirName`,`dirID` FROM `directory` WHERE `username`='$username'";
     
     $result = mysqli_query($db, $query);

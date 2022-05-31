@@ -14,7 +14,7 @@
             return;
         }
 
-        $db = mysqli_connect('localhost', 'root', '', 'loginPage') or die("Connect failed: %s\n". $db -> error);        
+        $db = mysqli_connect('localhost', 'root', '', 'test') or die("Connect failed: %s\n". $db -> error);        
 
         // insert the new directory into the `directory` table
         $query = "INSERT INTO `directory`(`dirName`, `username`,`metadata`) VALUES ('$dirName','$username','[]')";

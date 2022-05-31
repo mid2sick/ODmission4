@@ -20,3 +20,4 @@ function getConnection()
 
 	return new PDO($dsn, $username, $password, $options);
 }
+?>

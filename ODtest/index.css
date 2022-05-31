@@ -108,3 +108,26 @@
   left: 20px;
 }
 
+.linkForm {
+  height: auto;
+  background-color: #cecece;
+  border: 0px;
+  padding: 0px;
+}
+
+.btn-link {
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  color: #0000EE;
+  padding: 0;
+  text-decoration: underline;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.rmDirBtn {
+  position: relative;
+  float: right;
+}

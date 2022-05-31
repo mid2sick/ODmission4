@@ -1,4 +1,5 @@
 <?php
+require_once('conn.php');
 // TODO
 // Assumption: user_id and doc_id are well defined in other tables,
 // and their datatypes are string and integer, respectively.
@@ -23,10 +24,8 @@ class User
 	function addDir($dir_name)
 	{
 		$result = false;
-
 		try {
 			$conn = getConnection();
-
 			$stmt = $conn->prepare('
 					INSERT INTO User_Dir (Owner_ID, Name)
 					VALUES (:Owner_ID, :Dir_Name)
@@ -34,7 +33,6 @@ class User
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
 			$result = $stmt->execute();
-
 			$stmt = null;
 			$conn = null;
 		} catch (PDOException $e) {
@@ -55,16 +53,14 @@ class User
 
 		try {
 			$conn = getConnection();
-
 			$stmt = $conn->prepare('
 					SELECT Name
 					FROM User_Dir
-					WEHRE Owner_ID = :Owner_ID
+					WHERE Owner_ID = :Owner_ID
 				');
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_STR);
 			$stmt->execute();
 			$user_dirs = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
 			$stmt = null;
 			$conn = null;
 		} catch (PDOException $e) {
@@ -174,7 +170,6 @@ class User
 	function listDocs($dir_name)
 	{
 		$docs = null;
-
 		try {
 			$conn = getConnection();
 
@@ -189,7 +184,7 @@ class User
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
 			$stmt->execute();
 			$docs = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
+			
 			$stmt = null;
 			$conn = null;
 		} catch (PDOException $e) {
@@ -243,7 +238,7 @@ class User
 
 		return $result;
 	}
-
+	
 	private function setError($location, $exception)
 	{
 		/*

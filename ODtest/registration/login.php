@@ -12,11 +12,11 @@
   	<h2>Login</h2>
   </div>
 	 
-  <form method="post" action="login.php">
+  <form method="post" action="login.php" class="myForm">
   	<?php include('errors.php'); ?>
   	<div class="input-group">
   		<label>Username</label>
-  		<input type="text" name="username" >
+  		<input type="text" name="userID" >
   	</div>
   	<div class="input-group">
   		<label>Password</label>

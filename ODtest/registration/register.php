@@ -10,11 +10,11 @@
   	<h2>Register</h2>
   </div>
 	
-  <form method="post" action="register.php">
+  <form method="post" action="register.php" class="myForm">
   	<?php include('errors.php'); ?>
   	<div class="input-group">
   	  <label>Username</label>
-  	  <input type="text" name="username" value="<?php echo $username; ?>">
+  	  <input type="text" name="userID" value="<?php echo $userID; ?>">
   	</div>
   	<div class="input-group">
   	  <label>Email</label>

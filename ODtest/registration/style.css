@@ -18,7 +18,17 @@
     border-radius: 10px 10px 0px 0px;
     padding: 20px;
   }
-  form, .content {
+  .content {
+    width: 90%;
+    height: 25em;
+    margin: 0px auto;
+    padding: 20px;
+    border: 1px solid #B0C4DE;
+    background: white;
+    border-radius: 0px 0px 10px 10px;
+  }
+
+  .myForm {
     width: 90%;
     height: 25em;
     margin: 0px auto;
