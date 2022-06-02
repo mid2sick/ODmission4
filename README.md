@@ -60,38 +60,50 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
 
 ## Schema
 
-1. 使用者所擁有的資料夾
+1. 使用者基本資料
+
+	```sql
+	CREATE TABLE OD_User (
+		ID INT(11) UNSIGNED AUTO_INCREMENT,
+		Username VARCHAR(32) UNIQUE NOT NULL,
+		PRIMARY KEY (ID),
+	)
+	```
+
+2. 使用者所擁有的資料夾
 
     ```sql
-    /*
-	把大括號改成小括號
-	`login` 是紀錄 user data 的 table
-	還要檢查 Owner_ID 跟 login 裡 ID 的編碼是否一樣（目前是 utf8mb4_general_ci）
-	*/
-
-	CREATE TABLE User_Dir(
-	    ID INT(32) UNSIGNED AUTO_INCREMENT,
-	    Owner_ID VARCHAR(32) NOT NULL,
-	    Name VARCHAR(32) NOT NULL,
-	    PRIMARY KEY (ID),
-	    UNIQUE KEY Alias_ID (Owner_ID, Name),
-	    FOREIGN KEY (Owner_ID) REFERENCES login(ID) ON DELETE CASCADE
+	CREATE TABLE User_Dir (
+		ID INT(11) UNSIGNED AUTO_INCREMENT,
+		Owner_ID VARCHAR(32) NOT NULL,
+		Name VARCHAR(32) NOT NULL,
+		PRIMARY KEY (ID),
+		UNIQUE KEY Alias_ID (Owner_ID, Name),
+		FOREIGN KEY (Owner_ID) REFERENCES OD_User(ID) ON DELETE CASCADE,
 	)
     ```
-    
-    > **TODO**: What is the schema of the table which stores user information?
 
-2. 資料夾底下的 metadata
+3. 資料夾底下的文件
 
     ```sql
-    CREATE TABLE Dir_Doc {
-        Dir_ID INTEGER NOT NULL,
-        Doc_ID INTEGER NOT NULL,
-        PRIMARY KEY (Dir_ID, DOC_ID),
-        FOREIGN KEY (Dir_ID) REFERENCES User_Dir(ID) ON DELETE CASCADE,
-        FOREIGN KEY (Doc_ID) REFERENCES Metadata(ID)
-    }
+	CREATE TABLE Dir_Doc (
+		Dir_ID INT(11) UNSIGNED NOT NULL,
+		Doc_ID BIGINT(20) UNSIGNED NOT NULL,
+		PRIMARY KEY (Dir_ID, DOC_ID),
+		FOREIGN KEY (Dir_ID) REFERENCES User_Dir(ID) ON DELETE CASCADE,
+		FOREIGN KEY (Doc_ID) REFERENCES Doc(ID) ON DELETE CASCADE,
+	)
     ```
+
+4. 文件內容 
+
+```sql
+CREATE TABLE Doc (
+	ID BIGINT(20) UNSIGNED AUTO_INCREMENT,
+	... // Metadata Fields
+	PRIMARY KEY (ID),
+)
+```
 
 ## 其他
 1. 若下載下來測試，必須更改 upload.php 內的 $target_dir 到想要上傳 csv 的資料夾
