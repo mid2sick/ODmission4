@@ -65,8 +65,9 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
 	```sql
 	CREATE TABLE OD_User (
 		ID INT(11) UNSIGNED AUTO_INCREMENT,
-		Username VARCHAR(32) UNIQUE NOT NULL,
+		Username VARCHAR(32) NOT NULL,
 		PRIMARY KEY (ID),
+		UNIQUE KEY Alias_ID (Username),
 	)
 	```
 
@@ -75,7 +76,7 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
     ```sql
 	CREATE TABLE User_Dir (
 		ID INT(11) UNSIGNED AUTO_INCREMENT,
-		Owner_ID VARCHAR(32) NOT NULL,
+		Owner_ID INT(11) NOT NULL,
 		Name VARCHAR(32) NOT NULL,
 		PRIMARY KEY (ID),
 		UNIQUE KEY Alias_ID (Owner_ID, Name),
@@ -87,23 +88,31 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
 
     ```sql
 	CREATE TABLE Dir_Doc (
+		ID BIGINT(21) UNSIGNED AUTO_INCREMENT,
 		Dir_ID INT(11) UNSIGNED NOT NULL,
-		Doc_ID BIGINT(20) UNSIGNED NOT NULL,
-		PRIMARY KEY (Dir_ID, DOC_ID),
+		Metadata_ID BIGINT(20) UNSIGNED NOT NULL,
+		`來源系統` VARCHAR(30),
+		`來源系統縮寫` VARCHAR(10),
+		`題名` TEXT,
+		`摘要` TEXT,
+		`類目階層` TEXT,
+		`原始時間紀錄` TEXT,
+		`西元年` SMALLINT(6),
+		`起始時間` DATE,
+		`結束時間` DATE,
+		`典藏號` VARCHAR(100),
+		`文件原系統頁面URL` TEXT,
+		`Original` TEXT,
+		`相關人員` TEXT,
+		`相關地點` TEXT,
+		`相關組織` TEXT,
+		`關鍵詞` TEXT,
+		PRIMARY KEY (ID),
 		FOREIGN KEY (Dir_ID) REFERENCES User_Dir(ID) ON DELETE CASCADE,
-		FOREIGN KEY (Doc_ID) REFERENCES Doc(ID) ON DELETE CASCADE,
 	)
     ```
 
-4. 文件內容 
-
-```sql
-CREATE TABLE Doc (
-	ID BIGINT(20) UNSIGNED AUTO_INCREMENT,
-	... // Metadata Fields
-	PRIMARY KEY (ID),
-)
-```
+### [User 操作資料夾與文件的 APIs](https://hackmd.io/3eeRLRl9T7WufTqsBcYI4Q?view)
 
 ## 其他
 1. 若下載下來測試，必須更改 upload.php 內的 $target_dir 到想要上傳 csv 的資料夾
