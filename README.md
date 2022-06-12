@@ -67,7 +67,7 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
 		ID INT(11) UNSIGNED AUTO_INCREMENT,
 		Username VARCHAR(32) NOT NULL,
 		PRIMARY KEY (ID),
-		UNIQUE KEY Alias_ID (Username),
+		UNIQUE KEY Alias_ID (Username)
 	)
 	```
 
@@ -76,11 +76,11 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
     ```sql
 	CREATE TABLE User_Dir (
 		ID INT(11) UNSIGNED AUTO_INCREMENT,
-		Owner_ID INT(11) NOT NULL,
+		Owner_ID INT(11) UNSIGNED NOT NULL,
 		Name VARCHAR(32) NOT NULL,
 		PRIMARY KEY (ID),
 		UNIQUE KEY Alias_ID (Owner_ID, Name),
-		FOREIGN KEY (Owner_ID) REFERENCES OD_User(ID) ON DELETE CASCADE,
+		FOREIGN KEY (Owner_ID) REFERENCES OD_User(ID) ON DELETE CASCADE
 	)
     ```
 
@@ -108,7 +108,7 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
 		`相關組織` TEXT,
 		`關鍵詞` TEXT,
 		PRIMARY KEY (ID),
-		FOREIGN KEY (Dir_ID) REFERENCES User_Dir(ID) ON DELETE CASCADE,
+		FOREIGN KEY (Dir_ID) REFERENCES User_Dir(ID) ON DELETE CASCADE
 	)
     ```
 
