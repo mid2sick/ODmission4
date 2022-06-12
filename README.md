@@ -114,5 +114,7 @@ client 端 submit name='submitCSV' 的 input 時此 API 會被呼叫。
 
 ### [User 操作資料夾與文件的 APIs](https://hackmd.io/3eeRLRl9T7WufTqsBcYI4Q?view)
 
+### [User APIs for Development](https://hackmd.io/8Coii0NTRkSw_FA80Qxt8g?view)
+
 ## 其他
 1. 若下載下來測試，必須更改 upload.php 內的 $target_dir 到想要上傳 csv 的資料夾

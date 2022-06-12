@@ -147,8 +147,8 @@ class User
 	 * @return  bool    $success_or_not
 	 *
 	 * col_val_pairs: array(
-	 *     column_name_1 = value_1,
-	 *     column_name_2 = value_2,
+	 *     column_name_1 => value_1,
+	 *     column_name_2 => value_2,
 	 *     ...
 	 * )
 	 *
@@ -295,9 +295,9 @@ class User
 	 * List all docs under a dir.
 	 *
 	 * @param   string  $dir_name
-	 * @return  array   $docs
+	 * @return  doc[]   $docs
 	 *
-	 * $dir_name = array(
+	 * $doc = array(
 	 *     'ID' => int
 	 *     'Metadata_ID' => int
 	 *     '來源系統' => string
@@ -391,8 +391,8 @@ class User
 	 * @return  bool    $success_or_not
 	 *
 	 * col_val_pairs: array(
-	 *     column_name_1 = value_1,
-	 *     column_name_2 = value_2,
+	 *     column_name_1 => value_1,
+	 *     column_name_2 => value_2,
 	 *     ...
 	 * )
 	 *
@@ -485,7 +485,7 @@ class User
 	{
 		/*
 		 * For debugging only, when a method might fail for various reasons,
-		 * the script is supposed to proceed based on error code.
+		 * the script is supposed to proceed based on error code instead.
 		 */
 		if (!$this->production_mode) {
 			echo "[User::$location] Error " . $exception->getCode()
