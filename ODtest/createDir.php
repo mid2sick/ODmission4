@@ -1,32 +1,23 @@
 <?php
-    if(isset($_POST['createDir'])) {
-        createDir();
-    }
+    header('Content-Type: application/json; charset=utf-8');
+    require_once('user.php');
+    require_once('crawler.php');
 
-    function createDir() {
-        // get the current user's name and the new directory's name 
-        $dirName = $_POST['newDir'];
-        $username = $_SESSION['username'];
-
-        // if the directory name is empty, return error
-        if (empty($dirName)) {
-            $_SESSION['uploadSuccess'] = "Error: Directory name cannot be empty.<br>";
-            return;
+    // if the client ask to create a directory
+    if(isset($_GET['createDir']) && isset($_GET['username'])) {
+        $dirName = $_GET['createDir'];
+        $username = $_GET['username'];
+        $user = new User($username);
+        if($dirName === '') {
+            echo json_encode("Failed to add directory: name should not be empty");
+        } else {
+            $addResult = $user->addDir($dirName);
+            if($addResult) {
+                echo json_encode("Add directory successfully");
+            } else {
+                echo json_encode("Failed to add directory");
+            }
         }
-
-        $db = mysqli_connect('localhost', 'root', '', 'test') or die("Connect failed: %s\n". $db -> error);        
-
-        // insert the new directory into the `directory` table
-        $query = "INSERT INTO `directory`(`dirName`, `username`,`metadata`) VALUES ('$dirName','$username','[]')";
-        mysqli_query($db, $query);
-        
-        // this query can acquire the largest dirID from a user
-        // $query = "SELECT directory.dirID FROM `directory` INNER JOIN (SELECT username, MAX(dirID) AS most_recent_dirID FROM `directory` GROUP BY username) tmpTable ON directory.username = '$username' AND directory.dirID = most_recent_dirID WHERE 1";
-        
-
-        // return if the edit successed                
-        $_SESSION['uploadSuccess'] = "Directory successfully created.<br>";
     }
 
-    
 ?>
