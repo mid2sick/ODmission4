@@ -1,7 +1,6 @@
 <?php
     header('Content-Type: application/json; charset=utf-8');
     require_once('user.php');
-    require_once('crawler.php');
     
     // if the client click a directory to ask for seeing documents in it
     // also set the currentDir session here

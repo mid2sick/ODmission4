@@ -3,9 +3,10 @@
     require_once('user.php');
 
     // if the client request to see the directory list
-    if (isset($_GET['username'])) {
+    if (isset($_GET['docID']) && isset($_GET['username'])) {
+        $docID = $_GET['docID'];
         $username = $_GET['username'];
         $user = new User($username);
-        echo json_encode($user->listDirs());
+        echo json_encode($user->removeDoc($docID));
 	}
 ?>

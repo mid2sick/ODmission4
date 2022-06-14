@@ -1,7 +1,6 @@
 <?php
     header('Content-Type: application/json; charset=utf-8');
     require_once('user.php');
-    require_once('crawler.php');
 
     // if the client ask to create a directory
     if(isset($_GET['createDir']) && isset($_GET['username'])) {
