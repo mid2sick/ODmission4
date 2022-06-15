@@ -51,7 +51,8 @@ def Crawling(webAbbr, inputID):
 		return False
 	
 	### Check if chromedriver is updated
-	chromedriver_autoinstaller.install(cwd=True)	
+	chromedriver_autoinstaller.install()
+	
 	### Crawling
 	tmpDict=None
 	try:

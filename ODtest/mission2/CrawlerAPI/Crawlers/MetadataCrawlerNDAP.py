@@ -15,8 +15,6 @@ WEBURL = "https://drtpa.th.gov.tw/index.php?act=Archive"
 ROW_WITH_DATA = 3
 ID_COL = 2
 WAITTIME = 10
-path = "/opt/lampp/htdocs/ODtest/mission2/"
-
 
 class MetadataCrawlerNDAP(MetadataCrawlerBase):
 	def __init__(self):
@@ -43,7 +41,8 @@ class MetadataCrawlerNDAP(MetadataCrawlerBase):
 			if i<=ROW_WITH_DATA:
 				i+=1
 				continue
-			ids.append(row[ID_COL][2:-1])
+			tmp = (row[ID_COL]).replace('=', '').replace('"', '')
+			ids.append(tmp)
 
 		return ids
 
@@ -53,6 +52,7 @@ class MetadataCrawlerNDAP(MetadataCrawlerBase):
 		chrome_options.add_argument('--disable-gpu')
 		browser = webdriver.Chrome(options=chrome_options)
 		browser.get(self.webUrl)
+
 		search = MetadataCrawlerUtils.WaitFindElement(browser, WAITTIME, By.ID, "search_input")
 		search.clear()
 		search.send_keys(idIn)
@@ -87,7 +87,7 @@ class MetadataCrawlerNDAP(MetadataCrawlerBase):
 		return strIn.replace(" ", "")
 
 	def DataLinking(self, dictIn):
-		infile = open(path + "CrawlerAPI/Crawlers/DataLinkNDAP.csv", 'r', encoding = 'utf-8-sig')
+		infile = open("./CrawlerAPI/Crawlers/DataLinkNDAP.csv", 'r', encoding = 'utf-8-sig')
 		rows = csv.reader(infile, delimiter=',')
 
 		tmpDict = {}

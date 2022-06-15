@@ -15,8 +15,6 @@ WEBURL = "https://onlinearchives.th.gov.tw/index.php?act=Archive"
 ROW_WITH_DATA = 3
 ID_COL = 2
 WAITTIME = 10
-path = "/opt/lampp/htdocs/ODtest/mission2/"
-
 
 class MetadataCrawlerAHTWH(MetadataCrawlerBase):
 	def __init__(self):
@@ -43,7 +41,8 @@ class MetadataCrawlerAHTWH(MetadataCrawlerBase):
 			if i<=ROW_WITH_DATA:
 				i+=1
 				continue
-			ids.append(row[ID_COL][2:-1])
+			tmp = (row[ID_COL]).replace('=', '').replace('"', '')
+			ids.append(tmp)
 
 		return ids
 
@@ -90,7 +89,7 @@ class MetadataCrawlerAHTWH(MetadataCrawlerBase):
 		return strIn.replace(" ", "")
 
 	def DataLinking(self, dictIn):
-		infile = open(path + "CrawlerAPI/Crawlers/DataLinkAHTWH.csv", 'r', encoding = 'utf-8-sig')
+		infile = open("./CrawlerAPI/Crawlers/DataLinkAHTWH.csv", 'r', encoding = 'utf-8-sig')
 		rows = csv.reader(infile, delimiter=',')
 
 		tmpDict = {}

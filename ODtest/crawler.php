@@ -6,18 +6,26 @@
         // return $jsonTmp;
 
         // the original code
-        echo "file name: ".$filename.", source: ".$fileSource."\n";
-        $command = escapeshellcmd('/usr/bin/python3 mission2/getID.py '.$filename.' '.$fileSource);
+        $pythonPath = 'C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python310\\python.exe';
+        $getIDPath = 'C:\\WebRoot\\OD\\ODmission4\\ODtest\\mission2\\getID.py';
+        echo "in crawler.php() file name: ".$filename.", source: ".$fileSource."\n";
+        $cmd = "$pythonPath $getIDPath $filename $fileSource";
+        # $command = "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python310 mission2\\getID.py";
+        echo $cmd;
+        $command = escapeshellcmd($cmd);
         $output = shell_exec($command);
         
         echo "file type: ".gettype($output)."\n";
         echo $output;
+        return $output;
     }
 
     function crawlMetadata($fileSource, $id) {
+        $pythonPath = 'C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python310\\python.exe';
+        $getIDPath = 'C:\\WebRoot\\OD\\ODmission4\\ODtest\\mission2\\crawlMetadata.py';
         echo "in crawler.php: crawlMetadata\n";
-        $command = escapeshellcmd('/usr/bin/python3 mission2/crawlMetadata.py '.$id.' '.$fileSource);
+        $command = escapeshellcmd($pythonPath.' '.$crawlMetadataPath.' '.$id.' '.$fileSource);
         $output = shell_exec($command);
-        echo $output;
+        return $output;
     }
 ?>

@@ -1,9 +1,9 @@
-print("<br>")
+print("in getID.py")
 try:
-	from mission2.CrawlerAPI.MetadataCrawlerAPI import InputToIDs
-	print("fin import inputToIDs")
+	from CrawlerAPI.MetadataCrawlerAPI import InputToIDs
+	print("fin import in getID.py")
 except:
-	print("import InputToIDs failed<br><br><br>")
+	print("import fail")
 # except ImportError:
 #     raise ImportError('fail to import InputToIDs')
 
@@ -15,9 +15,9 @@ if __name__ == '__main__':
 	parser.add_argument("inputFileName", type=str)
 	parser.add_argument("inputWebAbbr", type=str)
 	args = parser.parse_args()
-	print("get web abbr: ", args.inputWebAbbr, "<br>")
 	### get ids
 	ids = InputToIDs(args.inputWebAbbr, args.inputFileName)
+	print("get ids in getID.py: ")
 	if ids==False:
 		print("wrong input<br>")
 		sys.exit()

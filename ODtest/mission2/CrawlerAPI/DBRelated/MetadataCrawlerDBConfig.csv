@@ -1,5 +1,5 @@
-servername,127.0.0.1
-username,root
-password,
+servername,localhost
+username,thdl
+password,thdl
 dbname,odsky
 tablename,metadata2

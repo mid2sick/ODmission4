@@ -3,9 +3,9 @@ function getConnection()
 {
 	/* Revise below to meet your actual need. */
 	$host = 'localhost';
-	$dbname = 'test';
-	$username = 'root';
-	$password = null;
+	$dbname = 'odsky';
+	$username = 'thdl';
+	$password = 'thdl';
 
 	/* Unless necessary, do not revise below. */
 	$dbms = 'mysql';

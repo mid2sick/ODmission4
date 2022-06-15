@@ -1,10 +1,8 @@
 import csv
 import mariadb
 
-path = "/opt/lampp/htdocs/ODtest/mission2/"
-
 def ConnectToDB():
-	infile = open(path + "CrawlerAPI/DBRelated/MetadataCrawlerDBConfig.csv", 'r', encoding = 'utf-8-sig')
+	infile = open("./CrawlerAPI/DBRelated/MetadataCrawlerDBConfig.csv", 'r', encoding = 'utf-8-sig')
 	rows = csv.reader(infile, delimiter=',')
 
 	config = []
@@ -27,7 +25,7 @@ def ConnectToDB():
 	return conn
 
 def GetTableName():
-	infile = open(path + "CrawlerAPI/DBRelated/MetadataCrawlerDBConfig.csv", 'r', encoding = 'utf-8-sig')
+	infile = open("./CrawlerAPI/DBRelated/MetadataCrawlerDBConfig.csv", 'r', encoding = 'utf-8-sig')
 	rows = csv.reader(infile, delimiter=',')
 	name = ""
 	for row in rows:
@@ -61,7 +59,7 @@ def CheckIsDataCrawlered(webAbbr, inputID):
 	return res
 
 def GetDBFormat():
-	infile = open(path + "CrawlerAPI/DBRelated/MetadataFormat.csv", 'r', encoding = 'utf-8-sig')
+	infile = open("./CrawlerAPI/DBRelated/MetadataFormat.csv", 'r', encoding = 'utf-8-sig')
 	rows = csv.reader(infile, delimiter=',')
 
 	DBList = []

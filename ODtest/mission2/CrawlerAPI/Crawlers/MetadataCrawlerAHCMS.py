@@ -15,7 +15,6 @@ WEBURL = "https://ahonline.drnh.gov.tw/index.php?act=Archive"
 ROW_WITH_DATA = 3
 ID_COL = 7
 WAITTIME = 10
-path = "/opt/lampp/htdocs/ODtest/mission2/"
 
 class MetadataCrawlerAHCMS(MetadataCrawlerBase):
 	def __init__(self):
@@ -85,7 +84,7 @@ class MetadataCrawlerAHCMS(MetadataCrawlerBase):
 		return strIn.replace(" ", "")
 
 	def DataLinking(self, dictIn):
-		infile = open(path + "CrawlerAPI/Crawlers/DataLinkAHCMS.csv", 'r', encoding = 'utf-8-sig')
+		infile = open("./CrawlerAPI/Crawlers/DataLinkAHCMS.csv", 'r', encoding = 'utf-8-sig')
 		rows = csv.reader(infile, delimiter=',')
 
 		tmpDict = {}
