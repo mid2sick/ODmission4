@@ -233,6 +233,7 @@ class User
 
 		try {
 			$conn = getConnection();
+
 			$stmt = $conn->prepare('
 					SELECT ' . Doc::getMetadataSelectExprs() . '
 					FROM metadata2
@@ -253,7 +254,7 @@ class User
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
 			$stmt->execute();
-			$dir_id = $stmt->fetch();
+			$dir_id = $stmt->fetch(PDO::FETCH_COLUMN);
 
 			$stmt = null;
 
@@ -269,16 +270,18 @@ class User
 			$question_marks = array();
 			$insert_values = array();
 			foreach ($docs as $doc) {
-				$insert_value = array('DIR_ID' => $dir_id["ID"]);
+				$insert_value = array('DIR_ID' => $dir_id);
 				$insert_value = array_merge($insert_value, $doc);
 				$question_marks[] = '(' . $placeholders('?', sizeof($insert_value)) . ')';
 				$insert_values = array_merge($insert_values, array_values($insert_value));
 			}
+
 			$stmt = $conn->prepare('
 				INSERT INTO Dir_Doc (DIR_ID,' . implode(',', Doc::getFields()) . ')
 				VALUES ' . implode(',', $question_marks)
 			);
 			$result = $stmt->execute($insert_values);
+
 			$stmt = null;
 			$conn = null;
 		} catch (PDOException $e) {
@@ -302,7 +305,7 @@ class User
 	 *     '題名' => string
 	 *     '摘要' => string
 	 *     '類目階層' => string
-	 *     '原始時間記錄 ' => string
+	 *     '原始時間記錄' => string
 	 *     '西元年' => int
 	 *     '起始時間' => date
 	 *     '結束時間' => date
