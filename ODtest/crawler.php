@@ -8,7 +8,6 @@
         // the original code
         $pythonPath = 'C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python310\\python.exe';
         $getIDPath = 'C:\\WebRoot\\OD\\ODmission4\\ODtest\\mission2\\getID.py';
-        echo "in crawler.php() file name: ".$filename.", source: ".$fileSource."\n";
         $cmd = "$pythonPath $getIDPath $filename $fileSource";
         # $command = "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python310 mission2\\getID.py";
         echo $cmd;
@@ -16,15 +15,16 @@
         $output = shell_exec($command);
         
         echo "file type: ".gettype($output)."\n";
-        echo $output;
         return $output;
     }
 
     function crawlMetadata($fileSource, $id) {
         $pythonPath = 'C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python310\\python.exe';
-        $getIDPath = 'C:\\WebRoot\\OD\\ODmission4\\ODtest\\mission2\\crawlMetadata.py';
+        $crawlMetadataPath = 'C:\\WebRoot\\OD\\ODmission4\\ODtest\\mission2\\crawlMetadata.py';
+
+        $cmd = "$pythonPath $crawlMetadataPath $id $fileSource";
         echo "in crawler.php: crawlMetadata\n";
-        $command = escapeshellcmd($pythonPath.' '.$crawlMetadataPath.' '.$id.' '.$fileSource);
+        $command = escapeshellcmd($cmd);
         $output = shell_exec($command);
         return $output;
     }

@@ -22,23 +22,26 @@
         $ids = getIDs($targetFile, $fileSource);
         echo "get ids:\n";
         echo $ids;
-        /*
-        # $idArr = json_decode($ids, true);
-		$fakeArr = array("0" => "303234395011", "1" => "343600001003", "2" => "003-5259", "3" => "343600002001");
+        
+        $idArr = json_decode($ids, true);
+		/*
+        $fakeArr = array("0" => "303234395011", "1" => "343600001003", "2" => "003-5259", "3" => "343600002001");
 		$idArr = $fakeArr;
 		echo "dumping ids...";
         var_dump($idArr);
         $crawlFail = [];
         */
         // call the crawler
-        /*
+        
         foreach($idArr as $docID) {
 			echo "try to crawl ".$docID." in ".$fileSource."\n";
             if(crawlMetadata($docID, $fileSource) == FALSE) {
 				echo "fail\n";
                 $crawlFail[] = $docID;
+            } else {
+                echo "success\n";
             }
-        }*/
+        }
 		/*
         if($crawlFail[] != NULL) {
             echo "Fail to crawl metadata:\n";
@@ -50,10 +53,11 @@
         // edit the Dir_Doc table
         $dirName = $_POST['dirName'];
         // $addFail = [];
-		// var_dump($idArr);
-		/*if($user->addDocs($dirName, $idArr) == False) {
+		if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == False) {
 			echo "\nFail to add docs\n";
-		}*/
+		} else {
+            echo "\nSuccess to add docs\n";
+        }
         /*
 		foreach($idArr as $docID) {
             echo "\nadd ".$docID." into ".$dirName."\n";

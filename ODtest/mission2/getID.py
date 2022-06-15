@@ -1,9 +1,8 @@
-print("in getID.py")
 try:
 	from CrawlerAPI.MetadataCrawlerAPI import InputToIDs
-	print("fin import in getID.py")
 except:
 	print("import fail")
+	sys.exit()
 # except ImportError:
 #     raise ImportError('fail to import InputToIDs')
 
@@ -17,7 +16,6 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 	### get ids
 	ids = InputToIDs(args.inputWebAbbr, args.inputFileName)
-	print("get ids in getID.py: ")
 	if ids==False:
 		print("wrong input<br>")
 		sys.exit()
