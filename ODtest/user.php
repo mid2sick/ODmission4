@@ -283,12 +283,13 @@ class User
 				INSERT INTO Dir_Doc (DIR_ID,' . implode(',', Doc::getFields()) . ')
 				VALUES ' . implode(',', $question_marks)
 			);
+			echo "before insert execution\n";
 			$result = $stmt->execute($insert_values);
-
+			echo "after insert execution\n";
 			$stmt = null;
 			$conn = null;
 		} catch (PDOException $e) {
-			$this->setError('addDocs', $e);
+			$this->setError('addDocsByDigitalIds', $e);
 		}
 
 		return $result;

@@ -52,20 +52,24 @@
         */
         // edit the Dir_Doc table
         $dirName = $_POST['dirName'];
+
         // $addFail = [];
-		if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == False) {
+		/*if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == False) {
 			echo "\nFail to add docs\n";
 		} else {
             echo "\nSuccess to add docs\n";
-        }
-        /*
+        }*/
+        echo "start to add into dir\n";
 		foreach($idArr as $docID) {
             echo "\nadd ".$docID." into ".$dirName."\n";
             if($user->addDocsByDigitalIds($dirName, $fileSource, $docID) == FALSE) {
                 $addFail[] = $docID;
+                echo "fail to add id $docID\n";
+            } else {
+                echo "success to add $docID\n";
             }
         }
-		*/
+		
         /*
         if($addFail[] != NULL) {
             echo "Fail to add documents:\n";
