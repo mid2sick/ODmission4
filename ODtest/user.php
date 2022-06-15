@@ -221,6 +221,80 @@ class User
 	}
 
 	/**
+	 * Add multiple metadata, by their digital IDs, to a dir as docs.
+	 *
+	 * @param   string      $dir_name
+	 * @param   string      $system_abbr
+	 * @param   string[]    $digital_ids
+	 * @return  bool        $success_or_not
+	 */
+	function addDocsByDigitalIds($dir_name, $system_abbr, $digital_ids)
+	{
+		$result = false;
+
+		try {
+			$conn = getConnection();
+
+			$stmt = $conn->prepare('
+					SELECT ' . Doc::getMetadataSelectExprs() . '
+					FROM metadata2
+					WHERE `來源系統縮寫` = :System_Abbr
+						AND `典藏號` IN (:Digital_IDs)
+				');
+			$stmt->bindParam(':System_Abbr', $system_abbr, PDO::PARAM_STR);
+			$stmt->bindParam(':Digital_IDs', $digital_ids, PDO::PARAM_STR);
+			$stmt->execute();
+			$docs = $stmt->fetchAll();
+
+			$stmt = null;
+
+			$stmt = $conn->prepare('
+					SELECT ID
+					FROM User_Dir
+					WHERE Owner_ID = :Owner_ID
+						AND Name = :Dir_Name
+				');
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
+			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
+			$stmt->execute();
+			$dir_id = $stmt->fetch(PDO::FETCH_COLUMN);
+
+			$stmt = null;
+
+			$placeholders = function ($text, $count = 0, $separator = ',') {
+				$result = array();
+
+				for ($i = 0; $i < $count; $i++)
+					$result[] = $text;
+
+				return implode($separator, $result);
+			};
+
+			$question_marks = array();
+			$insert_values = array();
+			foreach ($docs as $doc) {
+				$insert_value = array('DIR_ID' => $dir_id);
+				$insert_value = array_merge($insert_value, $doc);
+				$question_marks[] = '(' . $placeholders('?', sizeof($insert_value)) . ')';
+				$insert_values = array_merge($insert_values, array_values($insert_value));
+			}
+
+			$stmt = $conn->prepare('
+				INSERT INTO Dir_Doc (DIR_ID,' . implode(',', Doc::getFields()) . ')
+				VALUES ' . implode(',', $question_marks)
+			);
+			$result = $stmt->execute($insert_values);
+
+			$stmt = null;
+			$conn = null;
+		} catch (PDOException $e) {
+			$this->setError('addDocs', $e);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Add multiple metadata to a dir as docs.
 	 *
 	 * @param   string  $dir_name
