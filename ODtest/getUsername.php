@@ -1,7 +1,7 @@
 <?php
     header('Content-Type: application/json; charset=utf-8');
     require_once('user.php');
-    require_once('Lib_security.php');
+    require_once('registration/Lib_security.php');
 
     my_session_start();
 
