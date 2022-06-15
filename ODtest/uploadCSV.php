@@ -5,44 +5,58 @@
 
     
     // upload CSV to a local directory
-    if(isset($_FILES['submitCSV']['name']) && isset($_POST['username'])) {        
+    if(isset($_FILES['submitCSV']['name']) && isset($_POST['username']) && isset($_POST['dirName'])) {        
         $username = $_POST['username'];
         $user = new User($username);
 
         // [IMPORTANT]: remember to change the below directory!!!
         $targetDir = "/home/nomearod/ODuploadCSV/";
         $targetFile = $targetDir . basename($_FILES["submitCSV"]["name"]);
+        $fileSource = getFileSource($_FILES["submitCSV"]["name"]);
 
         // $fileSource = $_POST['fileSource'];
         $fileType = strtolower(pathinfo($targetFile,PATHINFO_EXTENSION));
         // check if the file is acceptable
         // if not, don't do the following instructions
         if(uploadFile($fileType, $targetFile) == FALSE) return;
-        $ids = getIDs($targetFile, "NDAP");
+        $ids = getIDs($targetFile, $fileSource);
         echo "get ids:\n";
         echo $ids;
-        // $targetFile = "/opt/lampp/htdocs/ODtest/NDAP.csv";
         /*
-        $ids = getIDs($targetFile, $fileSource);
         $ids = json_decode($ids);
         var_dump($ids);
-        
-        // edit the Dir_Doc table
-        $dirName = $_SESSION['currentDir'];
-        $failMsg = "Fail to add documents: ";
-        $notSuccess = FALSE;
+        $crawlFail = [];
+        // call the crawler
         foreach($ids as $docID) {
-            echo $docID;
-            if($user->addDocs($dirName, $docID) == FALSE) {
-                $failMsg = $failMsg.$docID." ";
-                $notSuccess = TRUE;
+            if(crawlMetadata($docID, $fileSource) == FALSE) {
+                $crawlFail[] = $docID;
+            }
+        }
+
+        if($crawlFail[] != NULL) {
+            echo "Fail to crawl metadata:\n";
+            foreach($crawlFail as $failID) {
+                echo $failID." ";
             }
         }
         
-        if($notSuccess) {
-            $failMsg = $failMsg."into your directory ".$dirName;
-            $_SESSION['msg'] = $failMsg;
+        // edit the Dir_Doc table
+        $dirName = $_POST['dirName'];
+        $addFail = [];
+        foreach($ids as $docID) {
+            echo $docID;
+            if($user->addDocs($dirName, $docID) == FALSE) {
+                $addFail[] = $docID;
+            }
         }
+        
+        if($addFail[] != NULL) {
+            echo "Fail to add documents:\n";
+            foreach($addFail as $failID) {
+                echo $failID." ";
+            }
+        }
+
         */
     }
     
@@ -56,23 +70,29 @@
         }*/
         // Allow certain file formats
         if($fileType != "csv") {
-            echo "Only .csv files are allowed.<br>";
+            echo "Only .csv files are allowed.\n";
             $uploadOk = 0;
         }
         // Check if $uploadOk is set to 0 by an error
         if ($uploadOk == 0) {
-            echo "Your file was not uploaded.<br>";
+            echo "Your file was not uploaded.\n";
         // if everything is ok, try to upload file
         } else {
-            // echo "Trying to upload file...<br>";
             if (move_uploaded_file($_FILES["submitCSV"]["tmp_name"], $targetFile)) {
-                echo "The file ". htmlspecialchars( basename( $_FILES["submitCSV"]["name"])). " has been uploaded.<br>";
+                echo "The file ". htmlspecialchars( basename( $_FILES["submitCSV"]["name"])). " has been uploaded.\n";
                 return TRUE;
             } else {
-                echo "There was an error uploading your file.<br>";
+                echo "There was an error uploading your file.\n";
             }
         }
         return FALSE;
+    }
+
+    function getFileSource($filename) {
+        if(substr($filename, 0, 5) === "AHCMS") return "AHCMS";
+        if(substr($filename, 0, 5) === "AHTWH") return "AHTWH";
+        if(substr($filename, 0, 5) === "NDAP") return "NDAP";
+        if(substr($filename, 0, 5) === "tlcda") return "TLCDA";
     }
 
 ?>
