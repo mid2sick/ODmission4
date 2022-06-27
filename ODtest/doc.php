@@ -42,8 +42,8 @@ class Doc
 	}
 
 	/**
-	 * Get field names, specifically mapped from original metadata,
-	 * of the document.
+	 * Get field names, specifically mapped from original metadata, of the
+	 * document.
 	 *
 	 * @return  string[]    $field_names
 	 */
@@ -53,7 +53,7 @@ class Doc
 	}
 
 	/**
-	 * Get expressions for select clause when querying metadata table.
+	 * Get expressions for SELECT clause of SQL when querying metadata table.
 	 *
 	 * @return  string  $query_metadata_select_exprs
 	 */
