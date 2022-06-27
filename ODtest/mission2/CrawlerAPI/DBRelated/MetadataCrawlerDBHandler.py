@@ -36,17 +36,19 @@ def GetTableName():
 def CheckIsDataCrawlered(webAbbr, inputID):
 	conn = ConnectToDB()
 	if conn==None: # Fail to connect to DB
-		return -1
+		return -1, -1
 	cur = conn.cursor()
 
 	tableName = GetTableName()
 
-	query = "SELECT `有沒有被匯入詳細資料` FROM `"+tableName+"` WHERE `來源系統縮寫`='"+webAbbr+"' AND `典藏號`='"+inputID+"'"
+	query = "SELECT `有沒有被匯入詳細資料`, `id` FROM `"+tableName+"` WHERE `來源系統縮寫`='"+webAbbr+"' AND `典藏號`='"+inputID+"'"
 	cur.execute(query)
 	# print(query)
 
 	res = None
+	primaryKey = None
 	for item in cur:
+		primaryKey = item[1]
 		if item[0]==b'\x01':
 			res = 1
 		else:
@@ -54,9 +56,9 @@ def CheckIsDataCrawlered(webAbbr, inputID):
 	
 	if res==None: # No data(record) found
 		print("No data(record) found")
-		return -1
+		return -1, -1
 
-	return res
+	return res, primaryKey
 
 def GetDBFormat():
 	infile = open("./CrawlerAPI/DBRelated/MetadataFormat.csv", 'r', encoding = 'utf-8-sig')
@@ -75,27 +77,27 @@ def UpdataDB(webAbbr, inputID, listIn):
 	cur = conn.cursor()
 
 	tableName = GetTableName()
-
 	DBList = GetDBFormat()
-	where = " WHERE `來源系統縮寫`='"+webAbbr+"' AND `典藏號`='"+inputID+"'"
-	try: 
-		for i in range(len(listIn)):
-			if listIn[i] == '@':
-				continue
+	updateList = ""
+	for i in range(len(listIn)):
+		if listIn[i] == '@':
+			continue
 
-			column = "`"+DBList[i]+"`"
-			target = "'"+listIn[i]+"'"
-			exe = "UPDATE `"+tableName+"` SET "+column+" = "+target+where
-			cur.execute(exe)
-			# print(exe)
-			 
+		column = "`"+DBList[i]+"`"
+		target = "'"+listIn[i]+"'"
+		
+		updateList += column+" = "+target+", "
+			
+	where = " WHERE `來源系統縮寫`='"+webAbbr+"' AND `典藏號`='"+inputID+"'"
+	exe = "UPDATE `"+tableName+"` SET "+updateList+"`有沒有被匯入詳細資料` = 1"+where
+	# print(exe)
+
+	try: 
+		cur.execute(exe)
 	except mariadb.Error as e: # update db fails 
 		# print(f"Error: {e}")
 		print("Updating DB fails")
 		return False
-
-	exe = "UPDATE `"+tableName+"` SET `有沒有被匯入詳細資料` = 1"+where
-	cur.execute(exe)
 
 	conn.commit()
 	return True

@@ -21,8 +21,8 @@ if __name__ == '__main__':
 
 	### use id to crawl (should be crawling by using multi-threading)
 	for i in range(len(ids)):
-		success = Crawling(inputWebAbbr, ids[i])
-		print(success)
+		primaryKey = Crawling(inputWebAbbr, ids[i])
+		print(primaryKey)
 		print("============")
 
 

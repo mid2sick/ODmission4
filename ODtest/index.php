@@ -1,18 +1,18 @@
 <?php 
 	session_start(); 
-	require_once('upload.php');
+	// require_once('upload.php');
 	// require_once('createDir.php');
 	require_once('server.php');
-	if (!isset($_SESSION['userID'])) {
+	if (!isset($_SESSION['username'])) {
 		$_SESSION['msg']="You must log in first";
 		header('location: registration/login.php');
 	}
 	if (isset($_GET['logout'])) {
 		session_destroy();
-		unset($_SESSION['userID']);
+		unset($_SESSION['username']);
 		header("location: registration/login.php");
 	}
-	$userID= $_SESSION['userID'];
+	$username= $_SESSION['username'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -55,9 +55,9 @@
 				</div>
 				<?php endif ?>
 				<!-- logged in user information -->
-				<?php  if (isset($_SESSION['userID'])) : ?>
+				<?php  if (isset($_SESSION['username'])) : ?>
 					<div class="personalBox">
-						<p>User <strong><?php echo $_SESSION['userID']; ?></strong></p>
+						<p>User <strong><?php echo $_SESSION['username']; ?></strong></p>
 						<p> <a href="index.php?logout='1'" style="color: red;">logout</a> </p>
 					</div>
 				<?php endif ?>
@@ -95,20 +95,26 @@
 						Select a csv file to upload:
 					</div>
 					<div>
+						<label for="fileSource">資料來源：</label>
+						<select name="fileSource" id="fileSource">
+							<option value="AHCMS">AHCMS 國史館檔案史料文物查詢系統</option>
+							<option value="AHTWH">AHTWH 國史館臺灣文獻館典藏管理系統</option>
+							<option value="NDAP">NDAP 臺灣省議會史料總庫</option>
+							<option value="TLCDA">TLCDA 地方議會議事錄</option>
+						</select>
 						<input type="file" name="fileToUpload" id="fileToUpload">
 						<input type="submit" class="uploadBtn" value="Upload File" name="submitCSV">
 					</div>
 				</form>
 				<!-- show the metadata -->
-				<div>
-					<form class="button rmDirBtn" action="" method="post">
-						<button name="removeDir" value="">移除當前資料夾</button>
-					</form>
-				</div>
-				<div id="metaList">
+				<form class="button rmDirBtn" action="" method="post">
+					<button name="removeDir" class="" value="" style="height:40px;z-index:100;position:relative">移除當前資料夾</button>
+				</form>
+				<div id="metaList" style="z-index: 90">
 					<!-- where the metadata wiil be put at -->
 					<?php
 						if(isset($_SESSION['listResult'])) {
+							echo "In directory: ".$_SESSION['currentDir'].'<br><br>';
 							var_dump($_SESSION['listResult']); 
 						} else {
 							echo "Please select a directory";
@@ -119,7 +125,7 @@
 		</div>
 		<!--
 		<script>
-			var usr = '<?php echo $userID; ?>';
+			var usr = '<?php echo $username; ?>';
 			updateDirList(usr);
 		</script>
 		-->
