@@ -24,8 +24,10 @@
 
         $cmd = "$pythonPath $crawlMetadataPath $id $fileSource";
         echo "in crawler.php: crawlMetadata\n";
+        echo "cmd: $cmd\n";
         $command = escapeshellcmd($cmd);
         $output = shell_exec($command);
+        echo $output;
         return $output;
     }
 ?>
