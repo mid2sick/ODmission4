@@ -11,11 +11,11 @@
    
    function my_session_start() {
       //var_export($_GET);
-      //var_export($_REQUEST);            // ­Y $_COOKIE ¦³­È¡A·|ÂÐ»\ $_GET ªº­È
+      //var_export($_REQUEST);            // ï¿½Y $_COOKIE ï¿½ï¿½ï¿½È¡Aï¿½|ï¿½Ð»\ $_GET ï¿½ï¿½ï¿½ï¿½
       //print session_name() . "\n";
       //exit(var_export($_REQUEST[session_name()]));
 
-      // 2021-02-06: §Q¥Î post ©Î get ªº URL °Ñ¼Æ switch session id
+      // 2021-02-06: ï¿½Qï¿½ï¿½ post ï¿½ï¿½ get ï¿½ï¿½ URL ï¿½Ñ¼ï¿½ switch session id
       $session_key = @$_POST[session_name()];
       if (!$session_key) $session_key = @$_GET[session_name()];
       //exit($session_key);
@@ -37,17 +37,17 @@
       // 2021-12-20
       header('Access-Control-Allow-Origin: *'); 
       
-      // ¦]¬°¬O session ³]©w¡A¥Î SameSite=Lax ©Î SameSite=Strict À³¸Ó ¤ñ SameSite=None §ó¦n¡H
-      //header('Set-Cookie: ' . session_name() . '=' . session_id() . '; SameSite=None; Secure');    // ¦]¬°¬O session ³]©w¡A¥Î SameSite=Strict À³¸Ó ¤ñ SameSite=None §ó¦n
-      // 2021-01-05: ­Y query ¬O¨«¨ó©w http¡A«h¤£¥[¤J Secure¡Ghttps «h¥[¤W Secure
+      // ï¿½]ï¿½ï¿½ï¿½O session ï¿½]ï¿½wï¿½Aï¿½ï¿½ SameSite=Lax ï¿½ï¿½ SameSite=Strict ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ SameSite=None ï¿½ï¿½nï¿½H
+      //header('Set-Cookie: ' . session_name() . '=' . session_id() . '; SameSite=None; Secure');    // ï¿½]ï¿½ï¿½ï¿½O session ï¿½]ï¿½wï¿½Aï¿½ï¿½ SameSite=Strict ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ SameSite=None ï¿½ï¿½n
+      // 2021-01-05: ï¿½Y query ï¿½Oï¿½ï¿½ï¿½ï¿½w httpï¿½Aï¿½hï¿½ï¿½ï¿½[ï¿½J Secureï¿½Ghttps ï¿½hï¿½[ï¿½W Secure
       if (@$_SERVER['HTTPS']) {
          header('Set-Cookie: ' . session_name() . '=' . session_id() . '; SameSite=None; Secure');
       }
       else {
-         // 2020-12-31: ²¾°£ Secure °Ñ¼Æ³]©w¡A¥iÅý http µn¤J¥D­¶®É¤´±a¦³ session cookie
-         //             => ÂsÄý¾¹±N¤£¤¹³\¦b HTTP ¤U¨Ï¥Î session cookie ¡]¥¼±a¦³ Expires ©Î Max-Age¡^¡I
-         //                ¥t¥~¡Apermanent cookie ­Y¦³ SameSite=Lax ©Î SameSite=Strict ¦ü¥G¤´¥i¥Í®Ä
-         // Chrome ¹w³] SameSite=Lax ¡]­Y SameSite=None¡A«h¥²¶·³]©w Secure ¤~·|¥Í®Ä¡^
+         // 2020-12-31: ï¿½ï¿½ï¿½ï¿½ Secure ï¿½Ñ¼Æ³]ï¿½wï¿½Aï¿½iï¿½ï¿½ http ï¿½nï¿½Jï¿½Dï¿½ï¿½ï¿½É¤ï¿½ï¿½aï¿½ï¿½ session cookie
+         //             => ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½b HTTP ï¿½Uï¿½Ï¥ï¿½ session cookie ï¿½]ï¿½ï¿½ï¿½aï¿½ï¿½ Expires ï¿½ï¿½ Max-Ageï¿½^ï¿½I
+         //                ï¿½tï¿½~ï¿½Apermanent cookie ï¿½Yï¿½ï¿½ SameSite=Lax ï¿½ï¿½ SameSite=Strict ï¿½ï¿½ï¿½Gï¿½ï¿½ï¿½iï¿½Í®ï¿½
+         // Chrome ï¿½wï¿½] SameSite=Lax ï¿½]ï¿½Y SameSite=Noneï¿½Aï¿½hï¿½ï¿½ï¿½ï¿½ï¿½]ï¿½w Secure ï¿½~ï¿½|ï¿½Í®Ä¡^
          //header('Set-Cookie: ' . session_name() . '=' . session_id() . '; SameSite=Strict');            
          header('Set-Cookie: ' . session_name() . '=' . session_id() . '; SameSite=None');            
       }

@@ -37,18 +37,18 @@ def InputToIDs(webAbbr, filePath, isReturnJson=True):
 
 def Crawling(webAbbr, inputID):
 	### Check if data is crawlered
-	checkNum = CheckIsDataCrawlered(webAbbr, inputID)
+	checkNum, primaryKey = CheckIsDataCrawlered(webAbbr, inputID)
 	if checkNum==1: # has crawlered
-		return True
+		return primaryKey
 	elif checkNum==0: # no crawlered
 		pass
 	else: # error
-		return False
+		return -1
 
 	### Get Crawler
 	crawler = GetCrawler(webAbbr)
 	if crawler==None: # Wrong webAbbr input
-		return False
+		return primaryKey
 	
 	### Check if chromedriver is updated
 	chromedriver_autoinstaller.install()
@@ -60,7 +60,7 @@ def Crawling(webAbbr, inputID):
 	except Exception as e:
 		# print(f"Error: {e}")
 		print("Crawling fails")
-		return False
+		return primaryKey
 
 	### Data cleaning
 	tmpDictClean = {}
@@ -73,5 +73,5 @@ def Crawling(webAbbr, inputID):
 	tmpList = crawler.DataLinking(tmpDictClean)
 	
 	### Updating DB
-	success = UpdataDB(webAbbr, inputID, tmpList)
-	return success
+	UpdataDB(webAbbr, inputID, tmpList)
+	return primaryKey

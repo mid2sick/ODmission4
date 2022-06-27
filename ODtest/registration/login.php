@@ -16,7 +16,7 @@
   	<?php include('errors.php'); ?>
   	<div class="input-group">
   		<label>Username</label>
-  		<input type="text" name="userID" >
+  		<input type="text" name="username" >
   	</div>
   	<div class="input-group">
   		<label>Password</label>

@@ -14,7 +14,7 @@
   	<?php include('errors.php'); ?>
   	<div class="input-group">
   	  <label>Username</label>
-  	  <input type="text" name="userID" value="<?php echo $userID; ?>">
+  	  <input type="text" name="username" value="<?php echo $username; ?>">
   	</div>
   	<div class="input-group">
   	  <label>Email</label>
