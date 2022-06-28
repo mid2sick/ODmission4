@@ -4,7 +4,14 @@
     require_once('crawler.php');
     require_once('job.php');
 
-
+    // for paralle crawling
+    function paralleCrawler($fileSource, $idArr) {
+        $crawlJob = new AsyncJob("crawlMetadata");
+        foreach($idArr as $docMetaID) {
+            $crawlJob->runOneWorker($fileSource, $docMetaID);
+        }
+        $crawlJob->joinAllWorkers();
+    }
 
     // upload CSV to a local directory
     if(isset($_FILES['submitCSV']['name']) && isset($_POST['username']) && isset($_POST['dirName'])) {  
@@ -39,11 +46,11 @@
         // edit the Dir_Doc table
         $dirName = $_POST['dirName'];
 
-        
-        /*if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == FALSE) {
-            echo "fail to add ids\n";
+        /*
+        if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == FALSE) {
+            echo "\nfail to add ids\n";
         } else {
-            echo "success to adds\n";
+            echo "\nsuccess to adds\n";
         }*/
         
         

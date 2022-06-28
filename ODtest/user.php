@@ -167,8 +167,8 @@ class User
 			foreach ($update_cols as $update_col) {
 				foreach ($BLACKLIST as $e) {
 					if ($update_col == $e) {
-						echo '[User::updateDir] Error: ',
-						"improper column '{$update_col}'";
+						echo '[User::updateDir] Error: ' .
+							"improper column '$update_col'";
 						return $result;
 					}
 				}
@@ -342,18 +342,17 @@ class User
 				return implode($separator, $result);
 			};
 
-			$fields = array_merge(array('Dir_ID'), Doc::getFields());
 			$question_marks = array();
 			$insert_values = array();
 			foreach ($docs as $doc) {
-				$insert_value = array('Dir_ID' => $dir_id);
+				$insert_value = array('DIR_ID' => $dir_id);
 				$insert_value = array_merge($insert_value, $doc);
 				$question_marks[] = '(' . $placeholders('?', sizeof($insert_value)) . ')';
 				$insert_values = array_merge($insert_values, array_values($insert_value));
 			}
 
 			$stmt = $conn->prepare('
-				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
+				INSERT INTO Dir_Doc (DIR_ID,' . implode(',', Doc::getFields()) . ')
 				VALUES ' . implode(',', $question_marks)
 			);
 			$result = $stmt->execute($insert_values);
@@ -487,8 +486,8 @@ class User
 			foreach ($update_cols as $update_col) {
 				foreach ($BLACKLIST as $e) {
 					if ($update_col == $e) {
-						echo '[User::updateDoc] Error: ',
-						"improper column '{$update_col}'";
+						echo '[User::updateDoc] Error: ' .
+							"improper column '$update_col'";
 						return $result;
 					}
 				}
@@ -524,11 +523,13 @@ class User
 	}
 
 	/**
-	 * Sync the content of the doc with original metadata.
+	 * Sync the content of the document with original metadata.
 	 * Note that this will overwrite the content.
 	 *
 	 * @param   int     $doc_id
 	 * @return  bool    $success_or_not
+	 *
+	 * This also servse as an example to use update function.
 	 */
 	function syncDocWithMetadata($doc_id)
 	{
@@ -555,110 +556,6 @@ class User
 		return $this->updateDoc($doc_id, Doc::metadata2doc($metadata));
 	}
 
-	/**
-	 * Move a doc from one dir to another.
-	 *
-	 * @param   int     $doc_id
-	 * @param   string  $dir_name
-	 * @return  bool    $success_or_not
-	 *
-	 * This also servse as an example to use update function.
-	 */
-	function moveDoc($doc_id, $dir_name)
-	{
-		try {
-			$conn = getConnection();
-
-			$stmt = $conn->prepare('
-					SELECT ID
-					FROM User_Dir
-					WHERE Owner_ID = :Owner_ID
-						AND Name = :Dir_Name
-				');
-			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
-			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-			$stmt->execute();
-			$dir_id = $stmt->fetch(PDO::FETCH_COLUMN);
-
-			$stmt = null;
-			$conn = null;
-		} catch (PDOException $e) {
-			$this->setError('moveDoc', $e);
-		}
-
-		return $this->updateDoc($doc_id, array(
-			'Dir_ID' => $dir_id,
-		));
-	}
-
-	/**
-	 * Copy a doc to a dir.
-	 *
-	 * @param   int     $doc_id
-	 * @param   string  $dir_name
-	 * @return  bool    $success_or_not
-	 */
-	function copyDoc($doc_id, $dir_name)
-	{
-		try {
-			$conn = getConnection();
-
-			/* Make sure user has the permission to view the doc. */
-			$stmt = $conn->prepare('
-					SELECT Dir_Doc.*
-					FROM User_Dir, Dir_Doc
-					WHERE Dir_Doc.ID = :Doc_ID
-						AND User_Dir.ID = Dir_Doc.Dir_ID
-						AND User_Dir.Owner_ID = :Owner_ID
-				');
-			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_INT);
-			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
-			$stmt->execute();
-			$doc = $stmt->fetch();
-
-			$stmt = null;
-
-			$stmt = $conn->prepare('
-					SELECT ID
-					FROM User_Dir
-					WHERE Owner_ID = :Owner_ID
-						AND Name = :Dir_Name
-				');
-			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
-			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-			$stmt->execute();
-			$dir_id = $stmt->fetch(PDO::FETCH_COLUMN);
-
-			$stmt = null;
-
-			$placeholders = function ($text, $count = 0, $separator = ',') {
-				$result = array();
-
-				for ($i = 0; $i < $count; $i++)
-					$result[] = $text;
-
-				return implode($separator, $result);
-			};
-
-			$fields = array_merge(array('Dir_ID'), Doc::getFields());
-			unset($doc['ID']);
-			$doc['Dir_ID'] = $dir_id;
-
-			$stmt = $conn->prepare('
-				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
-				VALUES (' . $placeholders('?', sizeof($doc)) . ')'
-			);
-			$result = $stmt->execute($doc);
-
-			$stmt = null;
-			$conn = null;
-		} catch (PDOException $e) {
-			$this->setError('copyDoc', $e);
-		}
-
-		return $result;
-	}
-
 	private function setError($location, $exception)
 	{
 		/*
@@ -666,8 +563,8 @@ class User
 		 * the script is supposed to proceed based on error code instead.
 		 */
 		if (!$this->production_mode) {
-			echo "[User::{$location}] Error {$exception->getCode()}: ",
-			$exception->getMessage();
+			echo "[User::$location] Error " . $exception->getCode()
+				. ": " . $exception->getMessage();
 		}
 		$this->last_err = (int) $exception->getCode();
 	}
