@@ -168,7 +168,7 @@ class User
 				foreach ($BLACKLIST as $e) {
 					if ($update_col == $e) {
 						echo '[User::updateDir] Error: ',
-						"improper column '{$update_col}'";
+							"improper column '{$update_col}'";
 						return $result;
 					}
 				}
@@ -218,6 +218,78 @@ class User
 		return $this->updateDir($dir_name, array(
 			'Name' => $new_name,
 		));
+	}
+
+	/**
+	 * Add multiple metadata to a dir as docs.
+	 *
+	 * @param   string  $dir_name
+	 * @param   int[]   $metadata_ids
+	 * @return  bool    $success_or_not
+	 */
+	function addDocs($dir_name, $metadata_ids)
+	{
+		$result = false;
+
+		try {
+			$conn = getConnection();
+
+			$stmt = $conn->prepare('
+					SELECT ' . Doc::getMetadataSelectExprs() . '
+					FROM metadata2
+					WHERE id IN (:IDs)
+				');
+			$stmt->bindParam(':IDs', $metadata_ids, PDO::PARAM_STR);
+			$stmt->execute();
+			$docs = $stmt->fetchAll();
+
+			$stmt = null;
+
+			$stmt = $conn->prepare('
+					SELECT ID
+					FROM User_Dir
+					WHERE Owner_ID = :Owner_ID
+						AND Name = :Dir_Name
+				');
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
+			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
+			$stmt->execute();
+			$dir_id = $stmt->fetch(PDO::FETCH_COLUMN);
+
+			$stmt = null;
+
+			$placeholders = function ($text, $count = 0, $separator = ',') {
+				$result = array();
+
+				for ($i = 0; $i < $count; $i++)
+					$result[] = $text;
+
+				return implode($separator, $result);
+			};
+
+			$fields = array_merge(array('Dir_ID'), Doc::getFields());
+			$question_marks = array();
+			$insert_values = array();
+			foreach ($docs as $doc) {
+				$insert_value = array('Dir_ID' => $dir_id);
+				$insert_value = array_merge($insert_value, $doc);
+				$question_marks[] = '(' . $placeholders('?', sizeof($insert_value)) . ')';
+				$insert_values = array_merge($insert_values, array_values($insert_value));
+			}
+
+			$stmt = $conn->prepare('
+				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
+				VALUES ' . implode(',', $question_marks)
+			);
+			$result = $stmt->execute($insert_values);
+
+			$stmt = null;
+			$conn = null;
+		} catch (PDOException $e) {
+			$this->setError('addDocs', $e);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -296,27 +368,31 @@ class User
 	}
 
 	/**
-	 * Add multiple metadata to a dir as docs.
+	 * Copy a doc to a dir.
 	 *
+	 * @param   int     $doc_id
 	 * @param   string  $dir_name
-	 * @param   int[]   $metadata_ids
 	 * @return  bool    $success_or_not
 	 */
-	function addDocs($dir_name, $metadata_ids)
+	function copyDoc($doc_id, $dir_name)
 	{
 		$result = false;
 
 		try {
 			$conn = getConnection();
 
+			/* Make sure user has the permission to view the doc. */
 			$stmt = $conn->prepare('
-					SELECT ' . Doc::getMetadataSelectExprs() . '
-					FROM metadata2
-					WHERE id IN (:IDs)
+					SELECT Dir_Doc.*
+					FROM User_Dir, Dir_Doc
+					WHERE Dir_Doc.ID = :Doc_ID
+						AND User_Dir.ID = Dir_Doc.Dir_ID
+						AND User_Dir.Owner_ID = :Owner_ID
 				');
-			$stmt->bindParam(':IDs', $metadata_ids, PDO::PARAM_STR);
+			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_INT);
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT); //TODO
 			$stmt->execute();
-			$docs = $stmt->fetchAll();
+			$doc = $stmt->fetch();
 
 			$stmt = null;
 
@@ -343,25 +419,19 @@ class User
 			};
 
 			$fields = array_merge(array('Dir_ID'), Doc::getFields());
-			$question_marks = array();
-			$insert_values = array();
-			foreach ($docs as $doc) {
-				$insert_value = array('Dir_ID' => $dir_id);
-				$insert_value = array_merge($insert_value, $doc);
-				$question_marks[] = '(' . $placeholders('?', sizeof($insert_value)) . ')';
-				$insert_values = array_merge($insert_values, array_values($insert_value));
-			}
+			unset($doc['ID']);
+			$doc['Dir_ID'] = $dir_id;
 
 			$stmt = $conn->prepare('
 				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
-				VALUES ' . implode(',', $question_marks)
+				VALUES (' . $placeholders('?', sizeof($doc)) . ')'
 			);
-			$result = $stmt->execute($insert_values);
+			$result = $stmt->execute(array_values($doc));
 
 			$stmt = null;
 			$conn = null;
 		} catch (PDOException $e) {
-			$this->setError('addDocs', $e);
+			$this->setError('copyDoc', $e);
 		}
 
 		return $result;
@@ -442,12 +512,17 @@ class User
 		try {
 			$conn = getConnection();
 
+			/* Make sure user has the permission to view the doc. */
 			$stmt = $conn->prepare('
-					DELETE FROM Dir_Doc
-					WHERE ID = :ID
+					DELETE Dir_Doc
+					FROM Dir_Doc
+						INNER JOIN User_Dir ON User_Dir.ID = Dir_Doc.Dir_ID
+					WHERE Dir_Doc.ID = :Doc_ID
+						AND User_Dir.Owner_ID = :Owner_ID
 				');
 			/* PDO does not support binding a BIGINT parameter. */
-			$stmt->bindParam(':ID', $doc_id, PDO::PARAM_STR, 21);
+			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_STR, 21);
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$result = $stmt->execute();
 
 			$stmt = null;
@@ -488,7 +563,7 @@ class User
 				foreach ($BLACKLIST as $e) {
 					if ($update_col == $e) {
 						echo '[User::updateDoc] Error: ',
-						"improper column '{$update_col}'";
+							"improper column '{$update_col}'";
 						return $result;
 					}
 				}
@@ -498,20 +573,24 @@ class User
 		$update_exps = array();
 		$update_vals = array();
 		foreach ($col_val_pairs as $col => $val) {
-			$update_exps[] = $col . ' = ?';
+			$update_exps[] = 'Dir_Doc.' . $col . ' = ?';
 			$update_vals[] = $val;
 		}
 
 		try {
 			$conn = getConnection();
 
+			/* Make sure user has the permission to view the doc. */
 			$stmt = $conn->prepare('
 					UPDATE Dir_Doc
+						INNER JOIN User_Dir ON User_Dir.ID = Dir_Doc.Dir_ID
 					SET ' . implode(',', $update_exps) . '
-					WHERE ID = :ID
+					WHERE Dir_Doc.ID = :Doc_ID
+						AND User_Dir.Owner_ID = :Owner_ID
 				');
 			/* PDO does not support binding a BIGINT parameter. */
 			$stmt->bindParam(':ID', $doc_id, PDO::PARAM_STR, 21);
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$result = $stmt->execute($update_vals);
 
 			$stmt = null;
@@ -532,6 +611,8 @@ class User
 	 */
 	function syncDocWithMetadata($doc_id)
 	{
+		$metadata = null;
+
 		try {
 			$conn = getConnection();
 
@@ -552,6 +633,9 @@ class User
 			$this->setError('syncDocWithMetadata', $e);
 		}
 
+		if (!$metadata)
+			return false;
+
 		return $this->updateDoc($doc_id, Doc::metadata2doc($metadata));
 	}
 
@@ -566,6 +650,8 @@ class User
 	 */
 	function moveDoc($doc_id, $dir_name)
 	{
+		$dir_id = null;
+
 		try {
 			$conn = getConnection();
 
@@ -586,77 +672,12 @@ class User
 			$this->setError('moveDoc', $e);
 		}
 
+		if (!$dir_id)
+			return false;
+
 		return $this->updateDoc($doc_id, array(
 			'Dir_ID' => $dir_id,
 		));
-	}
-
-	/**
-	 * Copy a doc to a dir.
-	 *
-	 * @param   int     $doc_id
-	 * @param   string  $dir_name
-	 * @return  bool    $success_or_not
-	 */
-	function copyDoc($doc_id, $dir_name)
-	{
-		try {
-			$conn = getConnection();
-
-			/* Make sure user has the permission to view the doc. */
-			$stmt = $conn->prepare('
-					SELECT Dir_Doc.*
-					FROM User_Dir, Dir_Doc
-					WHERE Dir_Doc.ID = :Doc_ID
-						AND User_Dir.ID = Dir_Doc.Dir_ID
-						AND User_Dir.Owner_ID = :Owner_ID
-				');
-			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_INT);
-			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
-			$stmt->execute();
-			$doc = $stmt->fetch();
-
-			$stmt = null;
-
-			$stmt = $conn->prepare('
-					SELECT ID
-					FROM User_Dir
-					WHERE Owner_ID = :Owner_ID
-						AND Name = :Dir_Name
-				');
-			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
-			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-			$stmt->execute();
-			$dir_id = $stmt->fetch(PDO::FETCH_COLUMN);
-
-			$stmt = null;
-
-			$placeholders = function ($text, $count = 0, $separator = ',') {
-				$result = array();
-
-				for ($i = 0; $i < $count; $i++)
-					$result[] = $text;
-
-				return implode($separator, $result);
-			};
-
-			$fields = array_merge(array('Dir_ID'), Doc::getFields());
-			unset($doc['ID']);
-			$doc['Dir_ID'] = $dir_id;
-
-			$stmt = $conn->prepare('
-				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
-				VALUES (' . $placeholders('?', sizeof($doc)) . ')'
-			);
-			$result = $stmt->execute($doc);
-
-			$stmt = null;
-			$conn = null;
-		} catch (PDOException $e) {
-			$this->setError('copyDoc', $e);
-		}
-
-		return $result;
 	}
 
 	private function setError($location, $exception)
@@ -667,7 +688,7 @@ class User
 		 */
 		if (!$this->production_mode) {
 			echo "[User::{$location}] Error {$exception->getCode()}: ",
-			$exception->getMessage();
+				$exception->getMessage();
 		}
 		$this->last_err = (int) $exception->getCode();
 	}
