@@ -52,7 +52,6 @@ class MetadataCrawlerAHTWH(MetadataCrawlerBase):
 		chrome_options.add_argument('--disable-gpu')
 		browser = webdriver.Chrome(executable_path='C:\\WebRoot\\OD\\ODmission4\\ODtest\\102\\chromedriver.exe', options=chrome_options)
 		browser.get(self.webUrl)
-		print("in MetadataCrawlerAHTWH.py: done webdriver.Chrome")
 
 		search = MetadataCrawlerUtils.WaitFindElement(browser, WAITTIME, By.ID, "search_input")
 		search.send_keys(idIn)

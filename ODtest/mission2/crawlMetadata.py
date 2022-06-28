@@ -7,8 +7,6 @@ if __name__ == '__main__':
 	parser.add_argument("inputID", type=str)
 	parser.add_argument("inputWebAbbr", type=str)
 	args = parser.parse_args()
-	print("get web abbr: ", args.inputWebAbbr)
-	print("get id: ", args.inputID)
 	### get ids
 	#ids = InputToIDs(args.inputWebAbbr, args.inputFileName)
 	#if ids==False:
@@ -18,6 +16,3 @@ if __name__ == '__main__':
 	#for item in ids:
 	success = Crawling(args.inputWebAbbr, args.inputID)
 	print(success)
-	print("============")
-
-

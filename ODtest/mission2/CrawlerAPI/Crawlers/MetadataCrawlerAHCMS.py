@@ -49,7 +49,7 @@ class MetadataCrawlerAHCMS(MetadataCrawlerBase):
 		chrome_options = Options() 
 		chrome_options.add_argument('--headless')
 		chrome_options.add_argument('--disable-gpu')
-		browser = webdriver.Chrome(options=chrome_options)
+		browser = webdriver.Chrome(executable_path='C:\\WebRoot\\OD\\ODmission4\\ODtest\\102\\chromedriver.exe', options=chrome_options)
 		browser.get(self.webUrl)
 
 		search = MetadataCrawlerUtils.WaitFindElement(browser, WAITTIME, By.ID, "search_input")

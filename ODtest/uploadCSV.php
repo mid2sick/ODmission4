@@ -2,6 +2,10 @@
     header('Content-Type: multipart/form-data; charset=utf-8');
     require_once('user.php');
     require_once('crawler.php');
+    require_once('job.php');
+
+
+
     // upload CSV to a local directory
     if(isset($_FILES['submitCSV']['name']) && isset($_POST['username']) && isset($_POST['dirName'])) {  
         $username = $_POST['username'];
@@ -18,50 +22,31 @@
         $ids = getIDs($targetFile, $fileSource);
         echo $ids;
         $idArr = json_decode($ids, true);
-        // $fakeArr = array("0" => "001-011120-00001-007");
         // $fakeArr = array("0" => "001-011120-00001-007", "1" => "001-011120-00001-017", "2" => "001-011120-00001-018", "3" => "001-011142-00015-001", "4" => "001-011142-00015-006");
 		// $idArr = $fakeArr;
-        // echo "dumping ids...";
-        // var_dump($idArr);
-		/*
-        $crawlFail = [];
-        */
+
         // call the crawler
-        
+        // paralleCrawler($fileSource, $idArr);
         foreach($idArr as $docID) {
 			echo "try to crawl ".$docID." in ".$fileSource."\n";
-            if(crawlMetadata($fileSource, $docID) === TRUE) {
+            if(crawlMetadata($fileSource, $docID) == TRUE) {
 				echo "crawl success\n";
             } else {
                 echo "crawl fail\n";
             }
         }
-		/*
-        if($crawlFail[] != NULL) {
-            echo "Fail to crawl metadata:\n";
-            foreach($crawlFail as $failID) {
-                echo $failID." ";
-            }
-        }
-        */
+
         // edit the Dir_Doc table
         $dirName = $_POST['dirName'];
-        // echo "add $fileSource";
-        // var_dump($idArr);
-        // echo " in dir $dirName\n";
-        // $addFail = [];
-		/*if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == False) {
-			echo "\nFail to add docs\n";
-		} else {
-            echo "\nSuccess to add docs\n";
-        }*/
-        /*
-        if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == FALSE) {
+
+        
+        /*if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == FALSE) {
             echo "fail to add ids\n";
         } else {
             echo "success to adds\n";
-        }
-        */
+        }*/
+        
+        
 		foreach($idArr as $docID) {
             echo "\nadd $fileSource $docID into $dirName\n";
             if($user->addDocsByDigitalIds($dirName, $fileSource, $docID) == FALSE) {
@@ -71,16 +56,7 @@
                 echo "success to add $docID\n";
             }
         }
-		
-        /*
-        if($addFail[] != NULL) {
-            echo "Fail to add documents:\n";
-            foreach($addFail as $failID) {
-                echo $failID." ";
-            }
-        }
-
-        */
+        
     }
     
     function uploadFile($fileType, $targetFile) {
