@@ -8,6 +8,7 @@
         $username = $_GET['username'];
         $targetDir = $_GET['targetDir'];
         $user = new User($username);
-        echo json_encode($user->addDocs($targetDir, $docID));
+        echo json_encode($user->copyDoc($docID, $targetDir));
+        // echo json_encode($user->addDocs($targetDir, $docID));
 	}
 ?>
