@@ -1,8 +1,6 @@
-print("in crawlMetadata.py before import\n")
 from CrawlerAPI.MetadataCrawlerAPI import Crawling
 import argparse
 import sys
-print("in crawlMetadata.py fin import\n")
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()

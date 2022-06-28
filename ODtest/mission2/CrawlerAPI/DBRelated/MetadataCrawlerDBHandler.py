@@ -2,7 +2,7 @@ import csv
 import mariadb
 
 def ConnectToDB():
-	infile = open("./CrawlerAPI/DBRelated/MetadataCrawlerDBConfig.csv", 'r', encoding = 'utf-8-sig')
+	infile = open("C:\WebRoot\OD\ODmission4\ODtest\mission2\CrawlerAPI\DBRelated\MetadataCrawlerDBConfig.csv", 'r', encoding = 'utf-8-sig')
 	rows = csv.reader(infile, delimiter=',')
 
 	config = []
@@ -25,7 +25,7 @@ def ConnectToDB():
 	return conn
 
 def GetTableName():
-	infile = open("./CrawlerAPI/DBRelated/MetadataCrawlerDBConfig.csv", 'r', encoding = 'utf-8-sig')
+	infile = open("C:\WebRoot\OD\ODmission4\ODtest\mission2\CrawlerAPI\DBRelated\MetadataCrawlerDBConfig.csv", 'r', encoding = 'utf-8-sig')
 	rows = csv.reader(infile, delimiter=',')
 	name = ""
 	for row in rows:
@@ -53,7 +53,7 @@ def CheckIsDataCrawlered(webAbbr, inputID):
 			res = 1
 		else:
 			res = 0
-	
+	print("write record: ", res)
 	if res==None: # No data(record) found
 		print("No data(record) found")
 		return -1, -1
@@ -61,7 +61,7 @@ def CheckIsDataCrawlered(webAbbr, inputID):
 	return res, primaryKey
 
 def GetDBFormat():
-	infile = open("./CrawlerAPI/DBRelated/MetadataFormat.csv", 'r', encoding = 'utf-8-sig')
+	infile = open("C:\WebRoot\OD\ODmission4\ODtest\mission2\CrawlerAPI\DBRelated\MetadataFormat.csv", 'r', encoding = 'utf-8-sig')
 	rows = csv.reader(infile, delimiter=',')
 
 	DBList = []

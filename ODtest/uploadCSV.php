@@ -15,19 +15,19 @@
         // check if the file is acceptable
         // if not, don't do the following instructions
         if(uploadFile($fileType, $targetFile) == FALSE) return;
-       // $ids = getIDs($targetFile, $fileSource);
-        // echo $ids;
-        // $idArr = json_decode($ids, true);
+        $ids = getIDs($targetFile, $fileSource);
+        echo $ids;
+        $idArr = json_decode($ids, true);
         // $fakeArr = array("0" => "001-011120-00001-007");
-        $fakeArr = array("0" => "001-011120-00001-007", "1" => "001-011120-00001-017", "2" => "001-011120-00001-018", "3" => "001-011142-00015-001", "4" => "001-011142-00015-006");
-		$idArr = $fakeArr;
+        // $fakeArr = array("0" => "001-011120-00001-007", "1" => "001-011120-00001-017", "2" => "001-011120-00001-018", "3" => "001-011142-00015-001", "4" => "001-011142-00015-006");
+		// $idArr = $fakeArr;
         // echo "dumping ids...";
         // var_dump($idArr);
 		/*
         $crawlFail = [];
         */
         // call the crawler
-        /*
+        
         foreach($idArr as $docID) {
 			echo "try to crawl ".$docID." in ".$fileSource."\n";
             if(crawlMetadata($fileSource, $docID) === TRUE) {
@@ -35,7 +35,7 @@
             } else {
                 echo "crawl fail\n";
             }
-        }*/
+        }
 		/*
         if($crawlFail[] != NULL) {
             echo "Fail to crawl metadata:\n";

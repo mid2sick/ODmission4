@@ -49,17 +49,19 @@ def Crawling(webAbbr, inputID):
 	crawler = GetCrawler(webAbbr)
 	if crawler==None: # Wrong webAbbr input
 		return primaryKey
-	
+	print("after get a crawler")
 	### Check if chromedriver is updated
-	chromedriver_autoinstaller.install()
-	
+	chromedriver_autoinstaller.install(cwd=True)
+	print("after install chrome driver")
 	### Crawling
 	tmpDict=None
 	try:
+		print("try IDcrawling in MetadataCrawlerAPI.py")
 		tmpDict = crawler.IDCrawling(inputID)
+		print("Crawling ran in MetadataCrawlerAPI.py")
 	except Exception as e:
 		# print(f"Error: {e}")
-		print("Crawling fails")
+		print("Crawling fails in MetadataCrawlerAPI.py")
 		return primaryKey
 
 	### Data cleaning

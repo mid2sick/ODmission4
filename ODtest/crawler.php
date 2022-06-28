@@ -1,5 +1,7 @@
 <?php
     // getIDs("/home/nomearod/ODuploadCSV/NDAP.csv", "NDAP");
+    echo "start\n";
+    // crawlMetadata("AHTWH", "00501103411");
     function getIDs($filename, $fileSource) {
         // fake a response
         // $jsonTmp = '{"0": "0014220037003", "1":"003-09-01EA-66-2-2-01-00942"}';
@@ -24,7 +26,7 @@
 
         $cmd = "$pythonPath $crawlMetadataPath $id $fileSource";
         echo "in crawler.php: crawlMetadata\n";
-        echo "cmd: $cmd\n";
+        echo "get cmd: $cmd\n";
         $command = escapeshellcmd($cmd);
         $output = shell_exec($command);
         echo $output;
