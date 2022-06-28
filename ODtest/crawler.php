@@ -1,7 +1,7 @@
 <?php
     // getIDs("/home/nomearod/ODuploadCSV/NDAP.csv", "NDAP");
     echo "start\n";
-    // crawlMetadata("AHTWH", "00501103411");
+    crawlMetadata("AHTWH", "00501103411");
     function getIDs($filename, $fileSource) {
         // fake a response
         // $jsonTmp = '{"0": "0014220037003", "1":"003-09-01EA-66-2-2-01-00942"}';

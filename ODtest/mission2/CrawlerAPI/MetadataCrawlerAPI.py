@@ -51,7 +51,7 @@ def Crawling(webAbbr, inputID):
 		return primaryKey
 	print("after get a crawler")
 	### Check if chromedriver is updated
-	chromedriver_autoinstaller.install(cwd=True)
+	# chromedriver_autoinstaller.install(cwd=True)
 	print("after install chrome driver")
 	### Crawling
 	tmpDict=None
