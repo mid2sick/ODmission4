@@ -38,11 +38,11 @@ class User
 			$stmt->bindParam(':Username', $user_name, PDO::PARAM_STR);
 			$stmt->execute();
 			$user_id = $stmt->fetch();
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('getUserID', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $user_id;
@@ -68,11 +68,11 @@ class User
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
 			$result = $stmt->execute();
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('addDir', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $result;
@@ -98,11 +98,11 @@ class User
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$stmt->execute();
 			$dir_names = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('listDirs', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $dir_names;
@@ -129,11 +129,11 @@ class User
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
 			$result = $stmt->execute();
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('removeDir', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $result;
@@ -186,19 +186,29 @@ class User
 			$conn = getConnection();
 
 			$stmt = $conn->prepare('
-					UPDATE User_Dir
-					SET ' . implode(',', $update_exps) . '
+					SELECT ID
+					FROM User_Dir
 					WHERE Owner_ID = :Owner_ID
 						AND Name = :Dir_Name
 				');
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
-			$result = $stmt->execute($update_vals);
+			$stmt->execute();
+			$dir_id = $stmt->fetch(PDO::FETCH_COLUMN);
 
 			$stmt = null;
-			$conn = null;
+
+			$stmt = $conn->prepare('
+					UPDATE User_Dir
+					SET ' . implode(',', $update_exps) . '
+					WHERE ID = ' . $dir_id
+				);
+			$result = $stmt->execute($update_vals);
 		} catch (PDOException $e) {
 			$this->setError('updateDir', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $result;
@@ -282,11 +292,11 @@ class User
 				VALUES ' . implode(',', $question_marks)
 			);
 			$result = $stmt->execute($insert_values);
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('addDocs', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $result;
@@ -355,13 +365,12 @@ class User
 				INSERT INTO Dir_Doc (DIR_ID,' . implode(',', Doc::getFields()) . ')
 				VALUES ' . implode(',', $question_marks)
 			);
-			echo "before insert execution\n";
 			$result = $stmt->execute($insert_values);
-			echo "after insert execution\n";
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('addDocsByDigitalIds', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $result;
@@ -427,11 +436,11 @@ class User
 				VALUES (' . $placeholders('?', sizeof($doc)) . ')'
 			);
 			$result = $stmt->execute(array_values($doc));
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('copyDoc', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $result;
@@ -485,11 +494,11 @@ class User
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
 			$stmt->execute();
 			$docs = $stmt->fetchAll();
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('listDocs', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		foreach ($docs as $doc) {
@@ -516,7 +525,7 @@ class User
 			$stmt = $conn->prepare('
 					DELETE Dir_Doc
 					FROM Dir_Doc
-						INNER JOIN User_Dir ON User_Dir.ID = Dir_Doc.Dir_ID
+						INNER JOIN User_Dir ON Dir_Doc.Dir_ID = User_Dir.ID
 					WHERE Dir_Doc.ID = :Doc_ID
 						AND User_Dir.Owner_ID = :Owner_ID
 				');
@@ -524,11 +533,11 @@ class User
 			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_STR, 21);
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$result = $stmt->execute();
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('removeDoc', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $result;
@@ -573,7 +582,7 @@ class User
 		$update_exps = array();
 		$update_vals = array();
 		foreach ($col_val_pairs as $col => $val) {
-			$update_exps[] = 'Dir_Doc.' . $col . ' = ?';
+			$update_exps[] = $col . ' = ?';
 			$update_vals[] = $val;
 		}
 
@@ -582,9 +591,9 @@ class User
 
 			/* Make sure user has the permission to view the doc. */
 			$stmt = $conn->prepare('
-					UPDATE Dir_Doc
-						INNER JOIN User_Dir ON User_Dir.ID = Dir_Doc.Dir_ID
-					SET ' . implode(',', $update_exps) . '
+					SELECT Dir_Doc.ID
+					FROM Dir_Doc
+						INNER JOIN User_Dir ON Dir_Doc.Dir_ID = User_Dir.ID
 					WHERE Dir_Doc.ID = :Doc_ID
 						AND User_Dir.Owner_ID = :Owner_ID
 				');
@@ -598,12 +607,22 @@ class User
 			/* PDO does not support binding a BIGINT parameter. */
 			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_STR, 21);
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
-			$result = $stmt->execute($update_vals);
+			$stmt->execute();
+			$doc_id = $stmt->fetch(PDO::FETCH_COLUMN);
 
 			$stmt = null;
-			$conn = null;
+
+			$stmt = $conn->prepare('
+					UPDATE Dir_Doc
+					SET ' . implode(',', $update_exps) . '
+					WHERE ID = ' . $doc_id
+				);
+			$result = $stmt->execute($update_vals);
 		} catch (PDOException $e) {
 			$this->setError('updateDoc', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		return $result;
@@ -635,11 +654,11 @@ class User
 			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_STR, 21);
 			$stmt->execute();
 			$metadata = $stmt->fetch();
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('syncDocWithMetadata', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		if (!$metadata)
@@ -674,11 +693,11 @@ class User
 			$stmt->bindParam(':Dir_Name', $dir_name, PDO::PARAM_STR);
 			$stmt->execute();
 			$dir_id = $stmt->fetch(PDO::FETCH_COLUMN);
-
-			$stmt = null;
-			$conn = null;
 		} catch (PDOException $e) {
 			$this->setError('moveDoc', $e);
+		} finally {
+			$stmt = null;
+			$conn = null;
 		}
 
 		if (!$dir_id)
