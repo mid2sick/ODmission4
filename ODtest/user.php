@@ -588,8 +588,15 @@ class User
 					WHERE Dir_Doc.ID = :Doc_ID
 						AND User_Dir.Owner_ID = :Owner_ID
 				');
+				echo '
+				UPDATE Dir_Doc
+					INNER JOIN User_Dir ON User_Dir.ID = Dir_Doc.Dir_ID
+				SET ' . implode(',', $update_exps) . '
+				WHERE Dir_Doc.ID = :Doc_ID
+					AND User_Dir.Owner_ID = :Owner_ID
+			';
 			/* PDO does not support binding a BIGINT parameter. */
-			$stmt->bindParam(':ID', $doc_id, PDO::PARAM_STR, 21);
+			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_STR, 21);
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$result = $stmt->execute($update_vals);
 
