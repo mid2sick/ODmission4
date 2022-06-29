@@ -243,7 +243,7 @@ class User
 
 		$question_mark = function($val_arr) {
 			return implode(',', array_fill(0, count($val_arr), '?'));
-		}
+		};
 
 		try {
 			$conn = getConnection();
@@ -311,7 +311,7 @@ class User
 
 		$question_mark = function($val_arr) {
 			return implode(',', array_fill(0, count($val_arr), '?'));
-		}
+		};
 
 		try {
 			$conn = getConnection();
@@ -378,7 +378,7 @@ class User
 
 		$question_mark = function($val_arr) {
 			return implode(',', array_fill(0, count($val_arr), '?'));
-		}
+		};
 
 		try {
 			$conn = getConnection();
