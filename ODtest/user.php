@@ -241,6 +241,10 @@ class User
 	{
 		$result = false;
 
+		$question_mark = function($val_arr) {
+			return implode(',', array_fill(0, count($val_arr), '?'));
+		}
+
 		try {
 			$conn = getConnection();
 
@@ -268,22 +272,13 @@ class User
 
 			$stmt = null;
 
-			$placeholders = function ($text, $count = 0, $separator = ',') {
-				$result = array();
-
-				for ($i = 0; $i < $count; $i++)
-					$result[] = $text;
-
-				return implode($separator, $result);
-			};
-
 			$fields = array_merge(array('Dir_ID'), Doc::getFields());
 			$question_marks = array();
 			$insert_values = array();
 			foreach ($docs as $doc) {
 				$insert_value = array('Dir_ID' => $dir_id);
 				$insert_value = array_merge($insert_value, $doc);
-				$question_marks[] = '(' . $placeholders('?', sizeof($insert_value)) . ')';
+				$question_marks[] = '(' . $question_mark($insert_value) . ')';
 				$insert_values = array_merge($insert_values, array_values($insert_value));
 			}
 
@@ -314,18 +309,20 @@ class User
 	{
 		$result = false;
 
+		$question_mark = function($val_arr) {
+			return implode(',', array_fill(0, count($val_arr), '?'));
+		}
+
 		try {
 			$conn = getConnection();
 
 			$stmt = $conn->prepare('
 					SELECT ' . Doc::getMetadataSelectExprs() . '
 					FROM metadata2
-					WHERE `來源系統縮寫` = :System_Abbr
-						AND `典藏號` IN (:Digital_IDs)
+					WHERE `來源系統縮寫` = ?
+						AND `典藏號` IN (' . $question_mark($digital_ids) . ')
 				');
-			$stmt->bindParam(':System_Abbr', $system_abbr, PDO::PARAM_STR);
-			$stmt->bindParam(':Digital_IDs', $digital_ids, PDO::PARAM_STR);
-			$stmt->execute();
+			$stmt->execute(array_merge(array($system_abbr), $digital_ids));
 			$docs = $stmt->fetchAll();
 
 			$stmt = null;
@@ -343,26 +340,18 @@ class User
 
 			$stmt = null;
 
-			$placeholders = function ($text, $count = 0, $separator = ',') {
-				$result = array();
-
-				for ($i = 0; $i < $count; $i++)
-					$result[] = $text;
-
-				return implode($separator, $result);
-			};
-
+			$fields = array_merge(array('Dir_ID'), Doc::getFields());
 			$question_marks = array();
 			$insert_values = array();
 			foreach ($docs as $doc) {
-				$insert_value = array('DIR_ID' => $dir_id);
+				$insert_value = array('Dir_ID' => $dir_id);
 				$insert_value = array_merge($insert_value, $doc);
-				$question_marks[] = '(' . $placeholders('?', sizeof($insert_value)) . ')';
+				$question_marks[] = '(' . $question_mark($insert_value) . ')';
 				$insert_values = array_merge($insert_values, array_values($insert_value));
 			}
 
 			$stmt = $conn->prepare('
-				INSERT INTO Dir_Doc (DIR_ID,' . implode(',', Doc::getFields()) . ')
+				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
 				VALUES ' . implode(',', $question_marks)
 			);
 			$result = $stmt->execute($insert_values);
@@ -386,6 +375,10 @@ class User
 	function copyDoc($doc_id, $dir_name)
 	{
 		$result = false;
+
+		$question_mark = function($val_arr) {
+			return implode(',', array_fill(0, count($val_arr), '?'));
+		}
 
 		try {
 			$conn = getConnection();
@@ -418,22 +411,13 @@ class User
 
 			$stmt = null;
 
-			$placeholders = function ($text, $count = 0, $separator = ',') {
-				$result = array();
-
-				for ($i = 0; $i < $count; $i++)
-					$result[] = $text;
-
-				return implode($separator, $result);
-			};
-
 			$fields = array_merge(array('Dir_ID'), Doc::getFields());
 			unset($doc['ID']);
 			$doc['Dir_ID'] = $dir_id;
 
 			$stmt = $conn->prepare('
 				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
-				VALUES (' . $placeholders('?', sizeof($doc)) . ')'
+				VALUES (' . $question_mark($doc) . ')'
 			);
 			$result = $stmt->execute(array_values($doc));
 		} catch (PDOException $e) {
