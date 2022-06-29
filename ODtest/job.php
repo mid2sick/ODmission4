@@ -1,5 +1,5 @@
 <?php
-
+use parallel\Runtime;
 /*
  * Requirement and installation:
  * https://github.com/krakjoe/parallel/blob/develop/INSTALL.md

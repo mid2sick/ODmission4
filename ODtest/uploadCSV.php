@@ -8,6 +8,7 @@
     function paralleCrawler($fileSource, $idArr) {
         $crawlJob = new AsyncJob("crawlMetadata");
         foreach($idArr as $docMetaID) {
+            echo "try to crawl ".$docMetaID." in ".$fileSource."\n";
             $crawlJob->runOneWorker($fileSource, $docMetaID);
         }
         $crawlJob->joinAllWorkers();
@@ -34,6 +35,7 @@
 
         // call the crawler
         // paralleCrawler($fileSource, $idArr);
+        // echo $idArr;
         foreach($idArr as $docID) {
 			echo "try to crawl ".$docID." in ".$fileSource."\n";
             if(crawlMetadata($fileSource, $docID) == TRUE) {
@@ -46,14 +48,14 @@
         // edit the Dir_Doc table
         $dirName = $_POST['dirName'];
 
-        /*
+        echo $idArr;
         if($user->addDocsByDigitalIds($dirName, $fileSource, $idArr) == FALSE) {
             echo "\nfail to add ids\n";
         } else {
             echo "\nsuccess to adds\n";
-        }*/
+        }
         
-        
+        /*
 		foreach($idArr as $docID) {
             echo "\nadd $fileSource $docID into $dirName\n";
             if($user->addDocsByDigitalIds($dirName, $fileSource, $docID) == FALSE) {
@@ -63,7 +65,7 @@
                 echo "success to add $docID\n";
             }
         }
-        
+        */
     }
     
     function uploadFile($fileType, $targetFile) {
