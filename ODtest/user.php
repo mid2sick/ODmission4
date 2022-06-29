@@ -6,7 +6,7 @@ class User
 {
 	private $id;
 	private $last_err;
-	private $production_mode; // TODO this should be in config file
+	private $production_mode; // TODO This should be set
 	//private $session_id; future work: sync data among multiple user devices
 
 	function __construct($user_name)
@@ -576,9 +576,9 @@ class User
 			/* Make sure user has the permission to view the doc. */
 			$stmt = $conn->prepare('
 					SELECT Dir_Doc.ID
-					FROM Dir_Doc
-						INNER JOIN User_Dir ON Dir_Doc.Dir_ID = User_Dir.ID
+					FROM Dir_Doc, User_Dir
 					WHERE Dir_Doc.ID = :Doc_ID
+						AND User_Dir.ID = Dir_Doc.Dir_ID
 						AND User_Dir.Owner_ID = :Owner_ID
 				');
 			/* PDO does not support binding a BIGINT parameter. */
