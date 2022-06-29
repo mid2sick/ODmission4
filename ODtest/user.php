@@ -676,7 +676,7 @@ class User
 
 		if (!$dir_id)
 			return false;
-
+		
 		return $this->updateDoc($doc_id, array(
 			'Dir_ID' => $dir_id,
 		));
