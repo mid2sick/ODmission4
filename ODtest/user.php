@@ -167,9 +167,9 @@ class User
 			foreach ($update_cols as $update_col) {
 				foreach ($BLACKLIST as $e) {
 					if ($update_col == $e) {
-						echo '[User::updateDir] Error: ',
+						echo '[User::updateDir] Warning: ',
 							"improper column '{$update_col}'";
-						return $result;
+						break;
 					}
 				}
 			}
@@ -390,7 +390,7 @@ class User
 						AND User_Dir.Owner_ID = :Owner_ID
 				');
 			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_INT);
-			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT); //TODO
+			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
 			$stmt->execute();
 			$doc = $stmt->fetch();
 
@@ -562,9 +562,9 @@ class User
 			foreach ($update_cols as $update_col) {
 				foreach ($BLACKLIST as $e) {
 					if ($update_col == $e) {
-						echo '[User::updateDoc] Error: ',
+						echo '[User::updateDoc] Warning: ',
 							"improper column '{$update_col}'";
-						return $result;
+						break;
 					}
 				}
 			}
