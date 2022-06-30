@@ -241,7 +241,7 @@ class User
 	{
 		$result = false;
 
-		$question_mark = function($val_arr) {
+		$question_mark = function ($val_arr) {
 			return implode(',', array_fill(0, count($val_arr), '?'));
 		};
 
@@ -283,9 +283,9 @@ class User
 			}
 
 			$stmt = $conn->prepare('
-				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
-				VALUES ' . implode(',', $question_marks)
-			);
+					INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
+					VALUES ' . implode(',', $question_marks)
+				);
 			$result = $stmt->execute($insert_values);
 		} catch (PDOException $e) {
 			$this->setError('addDocs', $e);
@@ -309,7 +309,7 @@ class User
 	{
 		$result = false;
 
-		$question_mark = function($val_arr) {
+		$question_mark = function ($val_arr) {
 			return implode(',', array_fill(0, count($val_arr), '?'));
 		};
 
@@ -351,9 +351,9 @@ class User
 			}
 
 			$stmt = $conn->prepare('
-				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
-				VALUES ' . implode(',', $question_marks)
-			);
+					INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
+					VALUES ' . implode(',', $question_marks)
+				);
 			$result = $stmt->execute($insert_values);
 		} catch (PDOException $e) {
 			$this->setError('addDocsByDigitalIds', $e);
@@ -376,7 +376,7 @@ class User
 	{
 		$result = false;
 
-		$question_mark = function($val_arr) {
+		$question_mark = function ($val_arr) {
 			return implode(',', array_fill(0, count($val_arr), '?'));
 		};
 
@@ -385,14 +385,25 @@ class User
 
 			/* Make sure user has the permission to view the doc. */
 			$stmt = $conn->prepare('
-					SELECT Dir_Doc.*
-					FROM User_Dir, Dir_Doc
+					SELECT Dir_Doc.ID
+					FROM Dir_Doc, User_Dir
 					WHERE Dir_Doc.ID = :Doc_ID
 						AND User_Dir.ID = Dir_Doc.Dir_ID
 						AND User_Dir.Owner_ID = :Owner_ID
 				');
-			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_INT);
+			/* PDO does not support binding a BIGINT parameter. */
+			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_STR, 21);
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
+			$stmt->execute();
+			$doc_id = $stmt->fetch(PDO::FETCH_COLUMN);
+
+			$stmt = null;
+
+			$stmt = $conn->prepare('
+					SELECT ' . Doc::getFields() . '
+					FROM Dir_Doc
+					WHERE ID = ' . $doc_id
+				);
 			$stmt->execute();
 			$doc = $stmt->fetch();
 
@@ -412,14 +423,13 @@ class User
 			$stmt = null;
 
 			$fields = array_merge(array('Dir_ID'), Doc::getFields());
-			unset($doc['ID']);
-			$doc['Dir_ID'] = $dir_id;
+			$insert_value = array_merge(array($dir_id), array_values($doc));
 
 			$stmt = $conn->prepare('
-				INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
-				VALUES (' . $question_mark($doc) . ')'
-			);
-			$result = $stmt->execute(array_values($doc));
+					INSERT INTO Dir_Doc (' . implode(',', $fields) . ')
+					VALUES (' . $question_mark($doc) . ')
+				');
+			$result = $stmt->execute($insert_value);
 		} catch (PDOException $e) {
 			$this->setError('copyDoc', $e);
 		} finally {
@@ -581,13 +591,6 @@ class User
 						AND User_Dir.ID = Dir_Doc.Dir_ID
 						AND User_Dir.Owner_ID = :Owner_ID
 				');
-				echo '
-				UPDATE Dir_Doc
-					INNER JOIN User_Dir ON User_Dir.ID = Dir_Doc.Dir_ID
-				SET ' . implode(',', $update_exps) . '
-				WHERE Dir_Doc.ID = :Doc_ID
-					AND User_Dir.Owner_ID = :Owner_ID
-			';
 			/* PDO does not support binding a BIGINT parameter. */
 			$stmt->bindParam(':Doc_ID', $doc_id, PDO::PARAM_STR, 21);
 			$stmt->bindParam(':Owner_ID', $this->id, PDO::PARAM_INT);
@@ -686,7 +689,7 @@ class User
 
 		if (!$dir_id)
 			return false;
-		
+
 		return $this->updateDoc($doc_id, array(
 			'Dir_ID' => $dir_id,
 		));
