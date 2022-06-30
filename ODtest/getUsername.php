@@ -8,7 +8,5 @@
     // return the username if the user has login
     if(isset($_SESSION['username'])) {
         echo json_encode($_SESSION['username']);
-    } else {
-        // echo json_encode("workshop04");
     }
 ?>

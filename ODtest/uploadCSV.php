@@ -2,17 +2,6 @@
     header('Content-Type: multipart/form-data; charset=utf-8');
     require_once('user.php');
     require_once('crawler.php');
-    require_once('job.php');
-
-    // for paralle crawling
-    function paralleCrawler($fileSource, $idArr) {
-        $crawlJob = new AsyncJob("crawlMetadata");
-        foreach($idArr as $docMetaID) {
-            echo "try to crawl ".$docMetaID." in ".$fileSource."\n";
-            $crawlJob->runOneWorker($fileSource, $docMetaID);
-        }
-        $crawlJob->joinAllWorkers();
-    }
 
     // upload CSV to a local directory
     if(isset($_FILES['submitCSV']['name']) && isset($_POST['username']) && isset($_POST['dirName'])) {  
@@ -30,12 +19,7 @@
         $ids = getIDs($targetFile, $fileSource);
         echo $ids;
         $idArr = json_decode($ids, true);
-        // $fakeArr = array("0" => "001-011120-00001-007", "1" => "001-011120-00001-017", "2" => "001-011120-00001-018", "3" => "001-011142-00015-001", "4" => "001-011142-00015-006");
-		// $idArr = $fakeArr;
 
-        // call the crawler
-        // paralleCrawler($fileSource, $idArr);
-        // echo $idArr;
         foreach($idArr as $docID) {
 			echo "try to crawl ".$docID." in ".$fileSource."\n";
             if(crawlMetadata($fileSource, $docID) == TRUE) {
@@ -54,18 +38,7 @@
         } else {
             echo "\nsuccess to adds\n";
         }
-        
-        /*
-		foreach($idArr as $docID) {
-            echo "\nadd $fileSource $docID into $dirName\n";
-            if($user->addDocsByDigitalIds($dirName, $fileSource, $docID) == FALSE) {
-                $addFail[] = $docID;
-                echo "fail to add id $docID\n";
-            } else {
-                echo "success to add $docID\n";
-            }
-        }
-        */
+
     }
     
     function uploadFile($fileType, $targetFile) {
